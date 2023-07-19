@@ -1,5 +1,7 @@
 # ggACene (global gridded Air Conditioning energy) projections
 
+![framework (2)](https://github.com/giacfalk/ggACene/assets/36954873/3ffea590-b7dd-40ef-a706-b879ab5fa2c5)
+
 This repository hosts code and data to reproduce the model generating the ggACene (global gridded Air Conditioning energy) projections dataset.
 
 ## Running the model
