@@ -16,4 +16,4 @@ To reproduce the model and generate the dataset from scratch, please refer to th
 Instead, to directly download the latest version of the (pre-generated) **ggACene** dataset (.ncdf files), access the *output_data* folder at the Zenodo data repository: https://doi.org/10.5281/zenodo.7845126
    
 ## References
-Falchetta, G., De Cian, E., Pavanello, F., & Wing, I. S. (in preparation). Global gridded scenarios of residential cooling energy demand to 2050. *Under review*
+Falchetta, G., De Cian, E., Pavanello, F., & Wing, I. S.Inequalities in global residential cooling energy use to 2050. *Under review*
