@@ -4,7 +4,7 @@ wd <- "F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projection
 
 setwd(wd)
 
-source("prepare_gridded_input_data.R")
+# source("prepare_gridded_input_data.R")
 
 setwd(wd)
 
