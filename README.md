@@ -4,17 +4,14 @@
 
 This repository contains computer code (in the R programming language) to replicate the ggACene (global gridded Air Conditioning energy) projections dataset, including preparing data, training models, and obtaining gridded projections. For queries: giacomo.falchetta@cmcc.it
 
-## 
+### Input data and analysis replication
 
-## Running the model
+## Instructions
 To reproduce the model and generate the dataset from scratch, please refer to the following steps:
- - Download input data from the Zenodo data repository: https://doi.org/10.5281/zenodo.7845126
- - Adjust the path folder in the preamble of the sourcer.R script
- - Run the sourcer.R script to train the ML model and make projections
+- Download input data "replication_package_input_data.7z" by cloning the following Zenodo data repository https://doi.org/10.5281/zenodo.8386094
+- Decompress the folder using 7-Zip (https://www.7-zip.org/download.html)
+- Open RStudio and adjust the path folder in the sourcer.R script
+- Run the sourcer.R script to train the ML model, make projections, and represent result files
 
-## Data download
-Instead, to directly download the latest version of the (pre-generated) **ggACene** dataset (.ncdf files), access the *output_data* folder at the Zenodo data repository: https://doi.org/10.5281/zenodo.7845126. The repository hosts data for SSPs126, 245, 370 and 585 on the estimated and future projected ownership of residential air conditioning, its energy consumption, and the underlying population (useful to quantify the per-capita average consumption or the headcount of people affected by the cooling gap).
-
-   
-## References
-Falchetta, G., De Cian, E., Pavanello, F., & Wing, I. S.Inequalities in global residential cooling energy use to 2050. *Under review*
+### References
+Falchetta, G., De Cian, E., Pavanello, F., & Wing, I. S. Inequalities in global residential cooling energy use to 2050. Forthcoming at Nature Communications
