@@ -116,6 +116,18 @@ shape_ac <- bind_cols(shape_ac, future_acc_q1, future_acc_q3)
 
 shape_ac_s <- dplyr::group_by(shape_ac, ISO3) %>% dplyr::summarise(SSP2.2010=weighted.mean(SSP2.2010, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050=weighted.mean(SSP2.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050=weighted.mean(SSP5.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP2.2010_q1=weighted.mean(SSP2.2010_q1, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050_q1=weighted.mean(SSP2.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050_q1=weighted.mean(SSP5.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP2.2010_q3=weighted.mean(SSP2.2010_q3, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050_q3=weighted.mean(SSP2.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050_q3=weighted.mean(SSP5.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2010=weighted.mean(SSP1.2010, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050=weighted.mean(SSP1.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050=weighted.mean(SSP3.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2010_q1=weighted.mean(SSP1.2010_q1, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050_q1=weighted.mean(SSP1.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050_q1=weighted.mean(SSP3.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2010_q3=weighted.mean(SSP1.2010_q3, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050_q3=weighted.mean(SSP1.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050_q3=weighted.mean(SSP3.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T))
 
+library(acid)
+
+shape_ac_s_gini <- dplyr::group_by(shape_ac, ISO3) %>% dplyr::reframe(SSP2.2010=weighted.gini(SSP2.2010, pop_ssps_data_ssp2_2020), SSP2.2050=weighted.gini(SSP2.2050, pop_ssps_data_ssp2_2050), SSP5.2050=weighted.gini(SSP5.2050, pop_ssps_data_ssp2_2050), SSP2.2010_q1=weighted.gini(SSP2.2010_q1, pop_ssps_data_ssp2_2020), SSP2.2050_q1=weighted.gini(SSP2.2050_q1, pop_ssps_data_ssp2_2050), SSP5.2050_q1=weighted.gini(SSP5.2050_q1, pop_ssps_data_ssp2_2050), SSP2.2010_q3=weighted.gini(SSP2.2010_q3, pop_ssps_data_ssp2_2020), SSP2.2050_q3=weighted.gini(SSP2.2050_q3, pop_ssps_data_ssp2_2050), SSP5.2050_q3=weighted.gini(SSP5.2050_q3, pop_ssps_data_ssp2_2050), SSP1.2010=weighted.gini(SSP1.2010, pop_ssps_data_ssp2_2020), SSP1.2050=weighted.gini(SSP1.2050, pop_ssps_data_ssp2_2050), SSP3.2050=weighted.gini(SSP3.2050, pop_ssps_data_ssp2_2050), SSP1.2010_q1=weighted.gini(SSP1.2010_q1, pop_ssps_data_ssp2_2020), SSP1.2050_q1=weighted.gini(SSP1.2050_q1, pop_ssps_data_ssp2_2050), SSP3.2050_q1=weighted.gini(SSP3.2050_q1, pop_ssps_data_ssp2_2050), SSP1.2010_q3=weighted.gini(SSP1.2010_q3, pop_ssps_data_ssp2_2020), SSP1.2050_q3=weighted.gini(SSP1.2050_q3, pop_ssps_data_ssp2_2050), SSP3.2050_q3=weighted.gini(SSP3.2050_q3, pop_ssps_data_ssp2_2050))
+
+cols.num <- colnames(shape_ac_s_gini)[2:19]
+
+shape_ac_s_gini[cols.num] <- sapply(shape_ac_s_gini[cols.num],as.numeric)
+
+shape_ac_s_gini <- shape_ac_s_gini %>% group_by(ISO3) %>% dplyr::summarise_at( .vars = colnames(.)[2:19], mean, na.rm=T)
+
+colnames(shape_ac_s_gini)[2:19] <- paste0(colnames(shape_ac_s_gini)[2:19], "_gini")
+
 #
 library(maptools)
 data("wrld_simpl")
@@ -156,13 +168,22 @@ library(stargazer)
 s_table <- shape_ac_s %>% dplyr::select(ISO3, SSP2.2010, SSP2.2050, SSP5.2050, SSP2.2010_q1, SSP2.2050_q1, SSP5.2050_q1, SSP2.2010_q3, SSP2.2050_q3, SSP5.2050_q3, SSP1.2010, SSP1.2050, SSP3.2050, SSP1.2010_q1, SSP1.2050_q1, SSP3.2050_q1, SSP1.2010_q3, SSP1.2050_q3, SSP3.2050_q3) %>% mutate(ISO3=as.character(ISO3))
 s_table$geometry <- NULL
 
+s_table <- bind_cols(s_table, shape_ac_s_gini %>% dplyr::select(-1))
+
 s_table$SSP2.2010 <- paste0(round(s_table$SSP2.2010, 2), " (", round(s_table$SSP2.2010_q1, 2), " - ", round(s_table$SSP2.2010_q3, 2), ")")
 s_table$SSP2.2050 <- paste0(round(s_table$SSP2.2050, 2), " (", round(s_table$SSP2.2050_q1, 2), " - ", round(s_table$SSP2.2050_q3, 2), ")")
 s_table$SSP5.2050 <- paste0(round(s_table$SSP5.2050, 2), " (", round(s_table$SSP5.2050_q1, 2), " - ", round(s_table$SSP5.2050_q3, 2), ")")
 s_table$SSP1.2050 <- paste0(round(s_table$SSP1.2050, 2), " (", round(s_table$SSP1.2050_q1, 2), " - ", round(s_table$SSP1.2050_q3, 2), ")")
 s_table$SSP3.2050 <- paste0(round(s_table$SSP3.2050, 2), " (", round(s_table$SSP3.2050_q1, 2), " - ", round(s_table$SSP3.2050_q3, 2), ")")
 
-s_table <- s_table %>% dplyr::select(-SSP2.2010_q1, -SSP2.2050_q1, -SSP5.2050_q1, -SSP2.2010_q3, -SSP2.2050_q3, -SSP5.2050_q3, -SSP1.2010_q1, -SSP1.2050_q1, -SSP3.2050_q1, -SSP1.2010_q3, -SSP1.2050_q3, -SSP3.2050_q3) %>% mutate(ISO3=as.character(ISO3))
+s_table <- s_table %>% dplyr::select(-SSP2.2010_q1, -SSP2.2050_q1, -SSP5.2050_q1, -SSP2.2010_q3, -SSP2.2050_q3, -SSP5.2050_q3, -SSP1.2010_q1, -SSP1.2050_q1, -SSP3.2050_q1, -SSP1.2010_q3, -SSP1.2050_q3, -SSP3.2050_q3, -SSP2.2010_q1_gini, -SSP2.2050_q1_gini, -SSP5.2050_q1_gini, -SSP2.2010_q3_gini, -SSP2.2050_q3_gini, -SSP5.2050_q3_gini, -SSP1.2010_q1_gini, -SSP1.2050_q1_gini, -SSP3.2050_q1_gini, -SSP1.2010_q3_gini, -SSP1.2050_q3_gini, -SSP3.2050_q3_gini) %>% mutate(ISO3=as.character(ISO3))
+
+s_table$SSP1.2010 <- NULL
+s_table$SSP1.2010_gini <- NULL
+
+s_table <- s_table[,c(1, 2, 7, 3, 8, 4, 9, 5, 10, 6, 11)]
+
+s_table <- s_table %>% dplyr::mutate_if(is.numeric, round, 2)
 
 stargazer::stargazer(s_table, summary=F, out="results/graphs_tables/AC_penetrations.tex")
 
@@ -221,6 +242,18 @@ shape_ely_diff_s <- dplyr::group_by(shape_ely_diff_m, ISO3) %>% dplyr::summarise
 
 #
 
+shape_ely_diff_gini <- dplyr::group_by(na.omit(shape_ely_diff_m), ISO3) %>% dplyr::reframe(ely_total_SSP2_2010= weighted.gini(cons_AC_SSP2.2010, (SSP2.2010*(pop_ssps_data_ssp2_2020))), ely_total_SSP2_2050= weighted.gini(cons_AC_SSP2.2050, (SSP2.2050*(pop_ssps_data_ssp2_2050))), ely_total_SSP5_2050= weighted.gini(cons_AC_SSP5.2050, (SSP5.2050*(pop_ssps_data_ssp5_2050))), ely_total_SSP1_2050= weighted.gini(cons_AC_SSP1.2050, (SSP1.2050*(pop_ssps_data_ssp1_2050))), ely_total_SSP3_2050= weighted.gini(cons_AC_SSP3.2050, (SSP3.2050*(pop_ssps_data_ssp3_2050))))
+#
+
+cols.num <- colnames(shape_ely_diff_gini)[2:6]
+
+shape_ely_diff_gini[cols.num] <- sapply(shape_ely_diff_gini[cols.num],as.numeric)
+
+shape_ely_diff_gini <- shape_ely_diff_gini %>% group_by(ISO3) %>% dplyr::summarise_at( .vars = colnames(.)[2:6], mean, na.rm=T)
+
+colnames(shape_ely_diff_gini)[2:6] <- paste0(colnames(shape_ely_diff_gini)[2:6], "_gini")
+
+
 data("wrld_simpl")
 wrld_simpl <- subset(wrld_simpl, wrld_simpl$ISO3!="ATA")
 wrld_simpl <- st_as_sf(wrld_simpl)
@@ -273,6 +306,17 @@ s_table$ely_total_SSP1_2050 <- paste0(round(s_table$ely_total_SSP1_2050, 2), " (
 s_table$ely_total_SSP3_2050 <- paste0(round(s_table$ely_total_SSP3_2050, 2), " (", round(s_table$ely_total_SSP3_2050_q1, 2), " - ", round(s_table$ely_total_SSP3_2050_q3, 2), ")")
 
 s_table <- s_table %>% dplyr::select(-ely_total_SSP2_2010_q1, -ely_total_SSP2_2050_q1, -ely_total_SSP5_2050_q1, -ely_total_SSP2_2010_q3, -ely_total_SSP2_2050_q3, -ely_total_SSP5_2050_q3, -ely_total_SSP1_2010_q1, -ely_total_SSP1_2050_q1, -ely_total_SSP3_2050_q1, -ely_total_SSP1_2010_q3, -ely_total_SSP1_2050_q3, -ely_total_SSP3_2050_q3) %>% mutate(ISO3=as.character(ISO3))
+
+###
+
+s_table <- merge(s_table, shape_ely_diff_gini, by="ISO3")
+
+s_table$ely_total_SSP1_2010 <- NULL
+s_table$ely_total_SSP1_2010_gini <- NULL
+
+s_table <- s_table[,c(1, 2, 7, 3, 8, 4, 9, 5, 10, 6, 11)]
+
+s_table <- s_table %>% dplyr::mutate_if(is.numeric, round, 2)
 
 stargazer::stargazer(s_table, summary=F, out="results/graphs_tables/ELY_AC_consumpton_TWh.tex")
 
@@ -418,7 +462,7 @@ lines_b <- ggplot(paths_pivot)+
 
 library(patchwork)
 
-(lines_a + scale_colour_manual(name="Scenario", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209")) + scale_fill_manual(name="Scenario", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209"))) + (lines_b + scale_colour_manual(name="Scenario", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209")) + scale_fill_manual(name="Scenario", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209"))) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
+(lines_a + scale_colour_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404")) + scale_fill_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))) + (lines_b + scale_colour_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404")) + scale_fill_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
 
 ggsave("results/graphs_tables/lines_plot.pdf", scale=2, height = 5, width = 4.5)
 
@@ -526,11 +570,11 @@ paths$level <- as.factor(paths$level)
 
 lines_a <- ggplot(paths)+
   theme_classic()+
-  geom_col(aes(x=level, y=(value)*100, group=decile, fill=decile), size=1.5, position = "dodge")+
+  geom_col(aes(x=level, y=(value)*100, group=decile, fill=decile), size=1.5, position = "dodge", colour="black", lwd=0.01)+
   facet_wrap(vars(ISO3), ncol=4)+
   scale_fill_brewer(name="Income quintile", palette="Blues")+
   xlab("Scenario")+
-  ylab("AC penetration rate, by income quntile")+
+  ylab("AC penetration rate")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
   labs(caption = "Income quintiles are calculated within each region.")
 
@@ -578,11 +622,11 @@ paths$level <- as.factor(paths$level)
 
 lines_b <- ggplot(paths)+
   theme_classic()+
-  geom_col(aes(x=level, y=(value), group=decile, fill=decile), size=1.5, position = "dodge")+
+  geom_col(aes(x=level, y=(value), group=decile, fill=decile), size=1.5, position = "dodge", colour="black", lwd=0.01)+
   facet_wrap(vars(ISO3), ncol=4)+
   scale_fill_brewer(name="Income quintile", palette="Blues")+
   xlab("Scenario")+
-  ylab("Mean AC electricity consumption per HH, by income quntile")+
+  ylab("Mean AC electricity consumption per HH")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
   labs(caption = "Income quintiles are calculated within each region.")
 
@@ -592,5 +636,5 @@ library(patchwork)
 
 (lines_a + lines_b) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
 
-ggsave("results/graphs_tables/quntiles_plot.pdf", scale=1.5, height = 10, width = 5.5)
+ggsave("results/graphs_tables/quntiles_plot.pdf", scale=1.25, height = 8, width = 6)
 

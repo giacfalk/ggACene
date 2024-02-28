@@ -83,10 +83,34 @@ load("results/global_wgt_dmcf.RData")
 
 global = reg_ely$data
 
+global <- as.data.frame(global)
+
+###
+
+l <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/climate/processed/hurs", pattern="rds", full.names = T)
+l <- lapply(l, read_rds)
+
+for(i in 1:length(l)){
+  print(i)
+  l[[i]] <- dplyr::select(l[[i]], state, country, hurs)
+}
+
+l <- dplyr::bind_rows(l)
+l <- group_by(l, country, state) %>% dplyr::summarise(hurs=mean(hurs,na.rm=T))
+
+global_bk <- global
+global$country <- as.character(global$country)
+global$id <- 1:nrow(global)
+global <- merge(global, l, by.x=c("country", "adm1"), by.y=c("country", "state"))
+global <- global[!duplicated(global$id),]
+global$id <- NULL
+
+###
+
 not_all_na <- function(x) any(!is.na(x))
 not_any_na <- function(x) all(!is.na(x))
 
-global <- dplyr::select(global, country, ac, ln_ely_q, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, n_members, weight)
+global <- dplyr::select(global, country, ac, ln_ely_q, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, n_members, weight, hurs, ely_p_usd_2011)
 
 global <- dplyr::select(global, where(not_all_na))
 
@@ -140,7 +164,7 @@ global$macroregion <- countrycode::countrycode(global$country, 'country.name', '
 # global <- filter(global, n_members<10)
 # global <- filter(global, age_head<99)
 
-global <- global %>% group_by(country) %>% filter_if(is.numeric, all_vars(between(., quantile(., .01), quantile(., .99))))
+global <- global %>% group_by(country) %>% filter_if(is.numeric, all_vars(between(., quantile(., .01, na.rm=T), quantile(., .99, na.rm=T))))
 
 global$mean_CDD18_db <- log((global$mean_CDD18_db*100)+1)
 global$mean_HDD18_db <- log((global$mean_HDD18_db*100)+1)

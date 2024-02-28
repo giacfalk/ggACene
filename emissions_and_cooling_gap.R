@@ -112,12 +112,12 @@ shape_ac_s_cs_1 <- shape_ac_s_cs_1 %>% dplyr::group_by(region) %>% dplyr::mutate
 
 cg_a <- ggplot()+
   theme_classic()+
-  geom_vline(data=shape_ac_s_cs_1, aes(xintercept = thresh), linetype="dashed", alpha=.75, colour="violet")+
-  geom_line(data=shape_ac_s_cs_1, aes(y=hist_cg_cs, x=CDD_245_2020), colour='grey')+
-  geom_line(data=shape_ac_s_cs_4, aes(y=SSP1.2050_cs, x=CDD_126_2050), colour="#fcec8d")+
-    geom_line(data=shape_ac_s_cs_2, aes(y=SSP2.2050_cs, x=CDD_245_2050), colour="#ffbe0a")+
-  geom_line(data=shape_ac_s_cs_5, aes(y=SSP3.2050_cs, x=CDD_370_2050), colour="#ff9830")+
-  geom_line(data=shape_ac_s_cs_3, aes(y=SSP5.2050_cs, x=CDD_585_2050), colour="#b51209")+
+  geom_vline(data=shape_ac_s_cs_1, aes(xintercept = thresh), linetype="dashed", alpha=.75, colour="violet", lwd=0.5)+
+  geom_line(data=shape_ac_s_cs_1, aes(y=hist_cg_cs, x=CDD_245_2020), colour='grey', lwd=0.5)+
+  geom_line(data=shape_ac_s_cs_4, aes(y=SSP1.2050_cs, x=CDD_126_2050), colour="#fcfc65", lwd=0.5)+
+    geom_line(data=shape_ac_s_cs_2, aes(y=SSP2.2050_cs, x=CDD_245_2050), colour="#facf96", lwd=0.5)+
+  geom_line(data=shape_ac_s_cs_5, aes(y=SSP3.2050_cs, x=CDD_370_2050), colour="#e38202", lwd=0.5)+
+  geom_line(data=shape_ac_s_cs_3, aes(y=SSP5.2050_cs, x=CDD_585_2050), colour="#b51209", lwd=0.5)+
   scale_y_continuous(labels=scales::label_percent())+
   facet_wrap(vars(region), nrow=2)+
   labs(caption = "Vertical dashed lines represent region-specific average historical CDDs/yr.")+
@@ -125,7 +125,7 @@ cg_a <- ggplot()+
   ylab("Cumulative % of pop. without AC")+
   scale_color_manual(name='Scenario',
                      breaks=c('2020', 'SSP126', 'SSP245','SSP370', 'SSP585'),
-                     values=c('2020'='grey', 'SSP126' = '#fcec8d', 'SSP245'='#ffbe0a', 'SSP370' = '#ff9830', 'SSP585'='#93003a'))#
+                     values=c('2020'='grey', 'SSP126' = '#fcfc65', 'SSP245'='#facf96', 'SSP370' = '#e38202', 'SSP585'='#7d0404'))#
 
 shape_ac_s_cs_1 <- shape_ac_s %>% dplyr::group_by(region) %>% dplyr::mutate(thresh=weighted.mean(CDD_245_2020, hist_cg, na.rm=T))%>% dplyr::summarise(cg = sum(hist_cg[CDD_245_2020>thresh], na.rm=T))
 
@@ -151,20 +151,20 @@ shape_ac_s_cs$scenario <- factor(shape_ac_s_cs$scenario, levels = c("2020", "SSP
 
 cg_b<- ggplot()+
   theme_classic()+
-  geom_col(data=shape_ac_s_cs, aes(x=cg/1e9, y=region, fill=scenario), colour="black", position = "dodge")+
-  geom_point(data=shape_ac_s_cs, aes(x=threshold/1000, y=region), colour="violet", size=1.5)+
-  scale_x_continuous("Billion people without AC exposed to CDDs/yr.> regional avg.)", sec.axis = sec_axis(~ ., name = "Pop.-weighted mean CDDs/yr. (thousands), historical climate"))+
+  geom_col(data=shape_ac_s_cs, aes(y=cg/1e9, x=region, fill=scenario), colour="black", position = "dodge")+
+  scale_y_continuous("Billion people without AC \nexposed to CDDs/yr.> regional avg.)")+
+  scale_x_discrete(name="", labels=c("GLOBAL", "EAP", "ECA", "LAC", "MENA", "NA", "SA", "SSA"))+
   scale_fill_manual(name='Scenario',
                      breaks=c("2020", "SSP126", "SSP245", "SSP370", "SSP585"),
-                     values=c('2020'='grey', 'SSP126' = '#fcec8d', 'SSP245'='#ffbe0a', 'SSP370' = '#ff9830', 'SSP585'='#93003a'))+
+                     values=c('2020'='grey', 'SSP126' = '#fcfc65', 'SSP245'='#facf96', 'SSP370' = '#e38202', 'SSP585'='#7d0404'))+
   ylab("Macroregion")+
-  theme(legend.position = "bottom", legend.direction = "horizontal",axis.text.x = element_text(angle = 90))
+  theme(legend.position = "bottom", legend.direction = "horizontal",axis.text.x = element_text(angle = 0))
 
 library(patchwork)
 
-cg_a + cg_b + plot_layout(ncol=1, heights = c(.8, 0.7)) + plot_annotation(tag_levels = "A")
+cg_a + cg_b + plot_layout(ncol=1, heights = c(1, 1)) + plot_annotation(tag_levels = "A")
 
-ggsave("results/graphs_tables/cooling_gap.pdf", scale=1.75, height = 6, width = 5)
+ggsave("results/graphs_tables/cooling_gap.pdf", scale=1.5, height = 6, width = 4.5)
 
 #################
 

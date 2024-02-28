@@ -52,11 +52,36 @@ output <- paste(stub,'6-Projections/results/regressions/', sep='')
 load("results/global_wgt_dmcf.RData")
 
 global = reg_ely$data
+global <- as.data.frame(global)
+
+###
+
+l <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/climate/processed/hurs", pattern="rds", full.names = T)
+l <- lapply(l, read_rds)
+
+for(i in 1:length(l)){
+  print(i)
+  l[[i]] <- dplyr::select(l[[i]], state, country, hurs)
+}
+
+l <- dplyr::bind_rows(l)
+l <- group_by(l, country, state) %>% dplyr::summarise(hurs=mean(hurs,na.rm=T))
+
+global_bk <- global
+global$country <- as.character(global$country)
+global$id <- 1:nrow(global)
+global <- merge(global, l, by.x=c("country", "adm1"), by.y=c("country", "state"))
+global <- global[!duplicated(global$id),]
+global$id <- NULL
+
+tapply(setdiff(global_bk, global %>% dplyr::select(-hurs))$adm1, setdiff(global_bk, global %>% dplyr::select(-hurs))$country, unique)
+
+###
 
 not_all_na <- function(x) any(!is.na(x))
 not_any_na <- function(x) all(!is.na(x))
 
-global <- dplyr::select(global, country, ac, ln_ely_q, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, n_members, weight)
+global <- dplyr::select(global, country, ac, ln_ely_q, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, n_members, ely_p_usd_2011, weight, hurs)
 
 global <- dplyr::select(global, where(not_all_na))
 
@@ -109,6 +134,8 @@ global$macroregion <- countrycode::countrycode(global$country, 'country.name', '
 # global <- filter(global, ln_total_exp_usd_2011<12.5& ln_total_exp_usd_2011 > 0)
 # global <- filter(global, n_members<10)
 # global <- filter(global, age_head<99)
+
+global <- na.omit(global)
 
 global <- global %>% group_by(country) %>% filter_if(is.numeric, all_vars(between(., quantile(., .01), quantile(., .99))))
 
@@ -206,11 +233,11 @@ library(caret)
 library(parallel)
 library(doParallel)
 
-global_ac_train_s1 <- dplyr::select(global_ac_train, ac, macroregion, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, weight)
+global_ac_train_s1 <- dplyr::select(global_ac_train, ac, macroregion, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, weight, ely_p_usd_2011, hurs)
 
 #global_ac_train_s1 <- dplyr::select(global_ac_train, ac, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, inc_q, cdd_q, hdd_q, weight)
 
-global_ac_test_s1 <- dplyr::select(global_ac_test, ac, macroregion, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, weight)
+global_ac_test_s1 <- dplyr::select(global_ac_test, ac, macroregion, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, weight, ely_p_usd_2011, hurs)
 
 
 #model_weights <- global_ac_train$weight
@@ -442,7 +469,7 @@ rm(rrfFit)
 # cl <- makeCluster(cores_2_use, outfile = "parallel_log_2.txt")
 # registerDoParallel(cl)
 
-global_ac_train_s2 <- dplyr::select(global_ac_train, country, macroregion, ln_ely_q, phat0_obs, mean_CDD18_db,  mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, weight)
+global_ac_train_s2 <- dplyr::select(global_ac_train, country, macroregion, ln_ely_q, phat0_obs, mean_CDD18_db,  mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, weight, ely_p_usd_2011, hurs)
 
 # folds <- 20
 # cvIndex <- CAST::CreateSpacetimeFolds(global_ac_train_s2, spacevar="country", k=folds, class="ln_ely_q")
@@ -522,7 +549,7 @@ rm(rrfFit_ely)
 training_acc_ac <- as.numeric(training_acc_ac)
 testing_acc_ac <- as.numeric(testing_acc_ac)
 
-save("training_acc_ac", "testing_acc_ac", "varImp_tr", "varImp_test", "r2_train", "r2_test", file=paste0(stub, "6-Projections/rscripts/global_spline/results/xgboost_models_benchmarks.Rdata"))
+save("training_acc_ac", "testing_acc_ac", "varImp_tr", "varImp_test", "r2_train", "r2_test", file=paste0(stub, "6-Projections/rscripts/global_spline/results/xgboost_models_benchmarks_jan24.Rdata"))
 
 #
 
@@ -530,7 +557,7 @@ global = bind_rows(global_ac_train, global_ac_test)
 
 #
 
-save("ac_model", "ely_model", "rrfFit_ac_shapely", "rrfFit_ely_shapely", "global_ac_train_s1", "global_ac_train_s2", "global", "global_ac", "terc_inc", "terc_cdd", "terc_hdd", file=paste0(stub, "6-Projections/rscripts/global_spline/results/xgboost_models.Rdata"))
+save("ac_model", "ely_model", "rrfFit_ac_shapely", "rrfFit_ely_shapely", "global_ac_train_s1", "global_ac_train_s2", "global", "global_ac", "terc_inc", "terc_cdd", "terc_hdd", file=paste0(stub, "6-Projections/rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
 
 ###
 
@@ -609,4 +636,4 @@ val_1_te <- ggplotConfusionMatrix2(cfm_te)
 
 val_1_tr + val_1_te + val_2_tr + val_2_te + plot_layout(ncol=2)
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/results/graphs_tables/accuracy_plot.png", scale=1.5, height = 5, width = 7)
+ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/results/graphs_tables/accuracy_plot_jan24.png", scale=1.5, height = 5, width = 7)

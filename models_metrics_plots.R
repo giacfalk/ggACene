@@ -79,7 +79,7 @@ setwd(paste0(stub, "rscripts/global_spline"))
 
 ###
 
-load(paste0(stub, "rscripts/global_spline/results/xgboost_models.Rdata"))
+load(paste0(stub, "rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
 
 ###
 

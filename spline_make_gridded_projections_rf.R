@@ -79,9 +79,23 @@ setwd(paste0(stub, "rscripts/global_spline"))
 
 ###
 
-load(paste0(stub, "rscripts/global_spline/results/xgboost_models_benchmarks.Rdata"))
-load(paste0(stub, "rscripts/global_spline/results/xgboost_models.Rdata"))
+load(paste0(stub, "rscripts/global_spline/results/xgboost_models_benchmarks_jan24.Rdata"))
+load(paste0(stub, "rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
 load(paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline_v2.Rds"))
+
+###
+
+# check NAs
+
+# library(pbapply)
+# 
+# l <- pblapply(5:(ncol(shape)-1), function(L) tapply(as.data.frame(shape[,c(L)] %>% st_set_geometry(NULL))[,1], shape$ISO3, function(X){
+#   a <- as.numeric((sum(is.na(X))))
+#   }))
+# l <- as.data.frame( do.call(cbind, l))
+# l[l==0] <- NA
+# colnames(l) <- colnames(shape)[5:(ncol(shape)-1)]
+# l <- l[!complete.cases(l)]
 
 ###
 
@@ -121,6 +135,8 @@ shape <- na.omit(shape)
 
 shape_all <- shape
 
+shape$geometry <- NULL
+
 ###
 
 # pops <- read_rds("pop_ssps_data_hist.Rds")
@@ -128,8 +144,6 @@ shape_all <- shape
 # shape <- merge(shape, pops, "id")
 
 #
-
-shape$geometry <- NULL
 
 orig_data_bk <- shape
 
@@ -169,6 +183,12 @@ output3 <- list()
 load(paste0(stub, "rscripts/global_spline/supporting_data/models_list.Rds"))
 cmip6_models <- models_list
 
+####
+
+# source("decomposition_drivers.R")
+
+####
+
 for (model in cmip6_models){
 print(model)
   
@@ -197,6 +217,10 @@ for (ssp in c("SSP1", "SSP2", "SSP3", "SSP5")){
     orig_data$mean_CDD18_db  = log(shape[,paste0("CDD_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2015, year), "_", model)] +1)
     
     orig_data$mean_HDD18_db  = log(shape[,paste0("HDD_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2015, year), "_", model)] +1)
+    
+    orig_data$hurs  = shape[,paste0("hurs_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2020, year), "_", model)]
+    
+    orig_data$ely_p_usd_2011 <- shape$elyprc
     
     orig_data$inc_q <- cut(exp(orig_data$ln_total_exp_usd_2011), terc_inc, include.lowest = T, labels=c(1,2,3))
     
@@ -310,6 +334,10 @@ for (model in cmip6_models){
     orig_data$mean_CDD18_db  = log(shape[,paste0("CDD_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2015, year), "_", model)] +1)
     
     orig_data$mean_HDD18_db  = log(shape[,paste0("HDD_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2015, year), "_", model)] +1)
+    
+    orig_data$hurs  = shape[,paste0("hurs_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2020, year), "_", model)]
+    
+    orig_data$ely_p_usd_2011 <- shape$elyprc
     
     orig_data$inc_q <- cut(exp(orig_data$ln_total_exp_usd_2011), terc_inc, include.lowest = T, labels=c(1,2,3))
     
@@ -427,6 +455,10 @@ for (model in cmip6_models){
     orig_data$mean_CDD18_db  = log(shape[,paste0("CDD_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2015, year), "_", model)] +1)
     
     orig_data$mean_HDD18_db  = log(shape[,paste0("HDD_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2015, year), "_", model)] +1)
+
+    orig_data$hurs  = shape[,paste0("hurs_", ifelse(ssp=="SSP2", 245, ifelse(ssp=="SSP1", 126, ifelse(ssp=="SSP3", 370, 585))), "_", ifelse(year==2010, 2020, year), "_", model)]
+    
+    orig_data$ely_p_usd_2011 <- shape$elyprc
     
     orig_data$inc_q <- cut(exp(orig_data$ln_total_exp_usd_2011), terc_inc, include.lowest = T, labels=c(1,2,3))
     
@@ -652,6 +684,8 @@ values(r4) <- ifelse(values(r4)<0, NA, values(r4))
 
 # figures: SSPs2-5 at 2050 for both margins
 
+newproj <- "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs"
+
 line = .8
 cex = 1
 side = 3
@@ -674,16 +708,16 @@ pdf("results/graphs_tables/maps_ac.pdf", height = 3, width = 5*2.2)
 
 par(mfrow = c(1, 3))
 
-plot(fasterize(shape_ac, r, "SSP2.2020")*100, col = terrain.colors(length(seq(0, 1, by = .1)*100)-1, rev=T), main="AC penetration (%), 2020", breaks= seq(0, 1, by = .1)*100, ylim=range(-60:90) ,xaxt = "n", yaxt = "n")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
+plot(fasterize(shape_ac, r, "SSP2.2020")*100, col = terrain.colors(length(seq(0, 1, by = .1)*100)-1, rev=T), main="AC penetration (% of households), 2020", breaks= seq(0, 1, by = .1)*100, ylim=range(-60:90) ,xaxt = "n", yaxt = "n")
+plot(wrld_simpl  %>% spTransform(newproj), add=TRUE, fill=NA, lwd=0.01)
 mtext("A", side=side, line=line, cex=cex, adj=adj)
 
-plot(fasterize(shape_ac, r, "SSP2.2050")*100, col = terrain.colors(length(seq(0, 1, by = .1)*100)-1, rev=T), main="AC penetration (%), SSP245, 2050", breaks= seq(0, 1, by = .1)*100, ylim=range(-60:90),xaxt = "n", yaxt = "n")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
+plot(fasterize(shape_ac, r, "SSP2.2050")*100, col = terrain.colors(length(seq(0, 1, by = .1)*100)-1, rev=T), main="AC penetration (% of households), SSP245, 2050", breaks= seq(0, 1, by = .1)*100, ylim=range(-60:90),xaxt = "n", yaxt = "n")
+plot(wrld_simpl  %>% spTransform(newproj), add=TRUE, fill=NA, lwd=0.01)
 mtext("B", side=side, line=line, cex=cex, adj=adj)
 
-plot(fasterize(shape_ac, r, "SSP5.2050")*100, col = terrain.colors(length(seq(0, 1, by = .1)*100)-1, rev=T), main="AC penetration (%), SSP585, 2050", breaks= seq(0, 1, by = .1)*100, ylim=range(-60:90) ,xaxt = "n", yaxt = "n")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
+plot(fasterize(shape_ac, r, "SSP5.2050")*100, col = terrain.colors(length(seq(0, 1, by = .1)*100)-1, rev=T), main="AC penetration (% of households), SSP585, 2050", breaks= seq(0, 1, by = .1)*100, ylim=range(-60:90) ,xaxt = "n", yaxt = "n")
+plot(wrld_simpl  %>% spTransform(newproj), add=TRUE, fill=NA, lwd=0.01)
 mtext("C", side=side, line=line, cex=cex, adj=adj)
 
 dev.off()
@@ -707,9 +741,11 @@ rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute ta
 rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
 levels(f1_c) <- rat
 
-plot(f1_c, col=heat.colors(5, rev=T), main="AC electr. cons. (GWh/yr), 2010", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend=F)
+f1_c <- projectRaster(f1_c, crs=newproj)
+
+plot(f1_c, col=heat.colors(5, rev=T), main="AC electricity use (GWh/yr.), 2010", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend=F)
 #legend(x='bottom', legend =rat$legend,fill = heat.colors(5, rev=T), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
+plot(wrld_simpl  %>% spTransform(newproj), add=TRUE, fill=NA, lwd=0.01)
 mtext("D", side=side, line=line, cex=cex, adj=adj)
 
 f1 = fasterize(shape_ely_diff, r, "ely_total_SSP2_2050")
@@ -725,9 +761,11 @@ rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute ta
 rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
 levels(f1_c) <- rat
 
-plot(f1_c, col=heat.colors(5, rev=T), main="AC electr. cons. (GWh/yr), 2050, SSP245", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend=F)
+f1_c <- projectRaster(f1_c, crs=newproj)
+
+plot(f1_c, col=heat.colors(5, rev=T), main="AC electricity use (GWh/yr.), 2050, SSP245", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend=F)
 legend(x='bottom', legend =rat$legend,fill = heat.colors(5, rev=T), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
+plot(wrld_simpl  %>% spTransform(newproj), add=TRUE, fill=NA, lwd=0.01)
 mtext("E", side=side, line=line, cex=cex, adj=adj)
 
 
@@ -744,9 +782,11 @@ rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute ta
 rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
 levels(f1_c) <- rat
 
-plot(f1_c, col=heat.colors(5, rev=T), main="AC electr. cons. (GWh/yr), 2050, SSP585", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend=F)
+f1_c <- projectRaster(f1_c, crs=newproj)
+
+plot(f1_c, col=heat.colors(5, rev=T), main="AC electricity use (GWh/yr.), 2050, SSP585", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend=F)
 #legend(x='bottom', legend =rat$legend,fill = heat.colors(5, rev=T), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
+plot(wrld_simpl  %>% spTransform(newproj), add=TRUE, fill=NA, lwd=0.01)
 mtext("F", side=side, line=line, cex=cex, adj=adj)
 
 dev.off()
@@ -760,294 +800,7 @@ pop_ssps_data <- stack(pop_ssps[2])[[10]]
 
 #
 
-pdf("results/graphs_tables/maps.pdf", height = 5*1.1, width = 6*2)
-
-par(mfrow = c(2, 3), mai = c(0.3, 0.25, 0.25, 0.15))
-
-
-f1 = fasterize(shape_ac, pop_ssps_data, "SSP2.2020")*100
-f1_c = f1
-f1_c[f1_c<0.01*100] <- NA
-f1_c[f1 >= 0.01*100 & f1 < 0.1*100] <- 1
-f1_c[f1 >= 0.1*100 & f1 < 0.25*100] <- 2
-f1_c[f1 >= 0.25*100 & f1 < 0.5*100] <- 3
-f1_c[f1 >= 0.5*100 & f1 < 0.75*100] <- 4
-f1_c[f1 >= 0.75*100] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c("1-10%", "10-25%", "25-50%", "50-75%", ">75%")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[2])[[10]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC penetration (%), 2020", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("A", side=side, line=line, cex=cex, adj=adj)
-
-f1 = fasterize(shape_ac, pop_ssps_data, "SSP2.2050")*100
-f1_c = f1
-f1_c[f1_c<0.01*100] <- NA
-f1_c[f1 >= 0.01*100 & f1 < 0.1*100] <- 1
-f1_c[f1 >= 0.1*100 & f1 < 0.25*100] <- 2
-f1_c[f1 >= 0.25*100 & f1 < 0.5*100] <- 3
-f1_c[f1 >= 0.5*100 & f1 < 0.75*100] <- 4
-f1_c[f1 >= 0.75*100] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c("1-10%", "10-25%", "25-50%", "50-75%", ">75%")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[2])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC penetration (%), SSP245, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent", text.width=42)
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("B", side=side, line=line, cex=cex, adj=adj)
-
-
-f1 = fasterize(shape_ac, pop_ssps_data, "SSP5.2050")*100
-f1_c = f1
-f1_c[f1_c<0.01*100] <- NA
-f1_c[f1 >= 0.01*100 & f1 < 0.1*100] <- 1
-f1_c[f1 >= 0.1*100 & f1 < 0.25*100] <- 2
-f1_c[f1 >= 0.25*100 & f1 < 0.5*100] <- 3
-f1_c[f1 >= 0.5*100 & f1 < 0.75*100] <- 4
-f1_c[f1 >= 0.75*100] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c("1-10%", "10-25%", "25-50%", "50-75%", ">75%")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[5])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC penetration (%), SSP585, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("C", side=side, line=line, cex=cex, adj=adj)
-
-f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP2_2020")
-f1_c = f1
-f1_c[f1_c<0.1] <- NA
-f1_c[f1 < 1] <- 1
-f1_c[f1 > 1 & f1 < 10] <- 2
-f1_c[f1 > 10 & f1 < 100] <- 3
-f1_c[f1 > 100 & f1 < 1000] <- 4
-f1_c[f1 > 1000] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[2])[[15]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC electr. cons. (GWh/yr), 2020", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = heat.colors(5, rev=T), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("D", side=side, line=line, cex=cex, adj=adj)
-
-f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP2_2050")
-f1_c = f1
-f1_c[f1_c<0.1] <- NA
-f1_c[f1 < 1] <- 1
-f1_c[f1 > 1 & f1 < 10] <- 2
-f1_c[f1 > 10 & f1 < 100] <- 3
-f1_c[f1 > 100 & f1 < 1000] <- 4
-f1_c[f1 > 1000] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[2])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC electr. cons. (GWh/yr), SSP245, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent", text.width = 42)
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("E", side=side, line=line, cex=cex, adj=adj)
-
-
-f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP5_2050")
-f1_c = f1
-f1_c[f1_c<0.1] <- NA
-f1_c[f1 < 1] <- 1
-f1_c[f1 > 1 & f1 < 10] <- 2
-f1_c[f1 > 10 & f1 < 100] <- 3
-f1_c[f1 > 100 & f1 < 1000] <- 4
-f1_c[f1 > 1000] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[5])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC electr. cons. (GWh/yr), SSP585, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = heat.colors(5, rev=T), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("F", side=side, line=line, cex=cex, adj=adj)
-
-dev.off()
-
-####
-
-pop_ssps <- list.files(path=paste0(stub, "data/projections/new_data_jan_2022/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
-pop_ssps_data <- stack(pop_ssps[1])[[10]]
-
-###
-
-pdf("results/graphs_tables/maps_si.pdf", height = 5*1.1, width = 6*2)
-
-par(mfrow = c(2, 3), mai = c(0.3, 0.25, 0.25, 0.15))
-
-
-f1 = fasterize(shape_ac, pop_ssps_data, "SSP1.2020")*100
-f1_c = f1
-f1_c[f1_c<0.01*100] <- NA
-f1_c[f1 >= 0.01*100 & f1 < 0.1*100] <- 1
-f1_c[f1 >= 0.1*100 & f1 < 0.25*100] <- 2
-f1_c[f1 >= 0.25*100 & f1 < 0.5*100] <- 3
-f1_c[f1 >= 0.5*100 & f1 < 0.75*100] <- 4
-f1_c[f1 >= 0.75*100] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c("1-10%", "10-25%", "25-50%", "50-75%", ">75%")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[1])[[10]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC penetration (%), 2020", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("A", side=side, line=line, cex=cex, adj=adj)
-
-f1 = fasterize(shape_ac, pop_ssps_data, "SSP1.2050")*100
-f1_c = f1
-f1_c[f1_c<0.01*100] <- NA
-f1_c[f1 >= 0.01*100 & f1 < 0.1*100] <- 1
-f1_c[f1 >= 0.1*100 & f1 < 0.25*100] <- 2
-f1_c[f1 >= 0.25*100 & f1 < 0.5*100] <- 3
-f1_c[f1 >= 0.5*100 & f1 < 0.75*100] <- 4
-f1_c[f1 >= 0.75*100] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c("1-10%", "10-25%", "25-50%", "50-75%", ">75%")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[1])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC penetration (%), SSP126, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent", text.width=42)
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("B", side=side, line=line, cex=cex, adj=adj)
-
-
-f1 = fasterize(shape_ac, pop_ssps_data, "SSP3.2050")*100
-f1_c = f1
-f1_c[f1_c<0.01*100] <- NA
-f1_c[f1 >= 0.01*100 & f1 < 0.1*100] <- 1
-f1_c[f1 >= 0.1*100 & f1 < 0.25*100] <- 2
-f1_c[f1 >= 0.25*100 & f1 < 0.5*100] <- 3
-f1_c[f1 >= 0.5*100 & f1 < 0.75*100] <- 4
-f1_c[f1 >= 0.75*100] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c("1-10%", "10-25%", "25-50%", "50-75%", ">75%")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[3])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC penetration (%), SSP370, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("C", side=side, line=line, cex=cex, adj=adj)
-
-f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP1_2020")
-f1_c = f1
-f1_c[f1_c<0.1] <- NA
-f1_c[f1 < 1] <- 1
-f1_c[f1 > 1 & f1 < 10] <- 2
-f1_c[f1 > 10 & f1 < 100] <- 3
-f1_c[f1 > 100 & f1 < 1000] <- 4
-f1_c[f1 > 1000] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[1])[[15]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC electr. cons. (GWh/yr), 2020", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = heat.colors(5, rev=T), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("D", side=side, line=line, cex=cex, adj=adj)
-
-f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP1_2050")
-f1_c = f1
-f1_c[f1_c<0.1] <- NA
-f1_c[f1 < 1] <- 1
-f1_c[f1 > 1 & f1 < 10] <- 2
-f1_c[f1 > 10 & f1 < 100] <- 3
-f1_c[f1 > 100 & f1 < 1000] <- 4
-f1_c[f1 > 1000] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[1])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC electr. cons. (GWh/yr), SSP126, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-legend(x='bottom', legend =rat$legend,fill = c('white', "lightyellow", '#ffce61', '#93003a', 'black'), horiz=T, box.col="transparent", text.width = 42)
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("E", side=side, line=line, cex=cex, adj=adj)
-
-
-f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP3_2050")
-f1_c = f1
-f1_c[f1_c<0.1] <- NA
-f1_c[f1 < 1] <- 1
-f1_c[f1 > 1 & f1 < 10] <- 2
-f1_c[f1 > 10 & f1 < 100] <- 3
-f1_c[f1 > 100 & f1 < 1000] <- 4
-f1_c[f1 > 1000] <- 5
-f1_c <- ratify(f1_c) # https://stackoverflow.com/questions/23840178/how-to-write-a-raster-with-rat-factors-in-r-raster-package
-rat <- levels(f1_c)[[1]]#get the values of the unique cell frot the attribute table
-rat$legend <- c('<1', "1-10", "10-100", "100-1000", "1000+")[1:nrow(levels(f1_c)[[1]])]
-levels(f1_c) <- rat
-
-# mask out pixels without population
-pop_ssps_data <- stack(pop_ssps[3])[[45]]
-f1_c <- raster::mask(f1_c, pop_ssps_data>1000, maskvalue=0)
-
-plot(f1_c, col=c('white', "lightyellow", '#ffce61', '#93003a', 'black'), main="AC electr. cons. (GWh/yr), SSP370, 2050", ylim=range(-60:90) ,xaxt = "n", yaxt = "n", legend = FALSE, axes=FALSE, box=FALSE)
-#legend(x='bottom', legend =rat$legend,fill = heat.colors(5, rev=T), horiz=T, box.col="transparent")
-plot(wrld_simpl, add=TRUE, fill=NA, lwd=0.05)
-mtext("F", side=side, line=line, cex=cex, adj=adj)
-
-dev.off()
+source("maps_gridded_v3.R")
 
 
 #########################

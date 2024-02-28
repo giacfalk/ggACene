@@ -1052,8 +1052,182 @@ colnames(shape)[4] <- "pop_ssps_data_hist"
 v <- expand.grid("pop_ssps_data", "_", seq(2010, 2050, 10), "_", c("ssp1", "ssp2", "ssp3", "ssp4", "ssp5"))
 colnames(shape)[5:29] <- paste0(v$Var1, v$Var2, v$Var5, v$Var4, v$Var3)
 
+####
+
+# add humidity
+
+# load(paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline_v2.Rds"))
+
+cmip6 <- "L:/falchetta/humidity_cmip"
+
+cmip6_hist_hurs_global_l <- list.files(cmip6, pattern = ".nc", full.names = T, recursive = F)
+cmip6_hist_hurs_global_l <- cmip6_hist_hurs_global_l[grepl("hist", cmip6_hist_hurs_global_l)]
+
+cmip6_hist_hurs_global_l <- stack(lapply(cmip6_hist_hurs_global_l, raster, band=10))
+cmip6_hist_hurs_global_l <- rotate(cmip6_hist_hurs_global_l)
+
+cmip6_hist_hurs_global_l <- stackApply(cmip6_hist_hurs_global_l, 1, mean, na.rm = T)
+
+shape <- st_as_sf(shape)
+
+hurs_hist_sf <- exact_extract(cmip6_hist_hurs_global_l, shape, 
+                              'mean', max_cells_in_memory = 93355200 )  
+
+hurs_hist_sf <- as.data.frame(hurs_hist_sf)
+
+colnames(hurs_hist_sf) <- c("hurs_2010")
+
+namess <- do.call(paste0, expand.grid(colnames(hurs_hist_sf), "_", filter_gcm))
+hurs_hist_sf <- bind_cols(rep(hurs_hist_sf, 14))
+colnames(hurs_hist_sf) <- namess
+
+###
+
+cmip6 <- "L:/falchetta/humidity_cmip"
+
+cmip6_126_hurs_global_l <- list.files(cmip6, pattern = ".nc", full.names = T, recursive = F)
+cmip6_126_hurs_global_l <- cmip6_126_hurs_global_l[grepl("126", cmip6_126_hurs_global_l)]
+cmip6_126_hurs_global_l <- cmip6_126_hurs_global_l[!grepl("json", cmip6_126_hurs_global_l)]
+cmip6_126_hurs_global_l <- stack(lapply(cmip6_126_hurs_global_l, raster, band=10))
+cmip6_126_hurs_global_l <- rotate(cmip6_126_hurs_global_l)
+cmip6_126_hurs_global_l <- stackApply(cmip6_126_hurs_global_l, rep(2015:2055, each=12), mean, na.rm = T)
+cmip6_126_hurs_global_l <- stackApply(cmip6_126_hurs_global_l, c(1, rep(1:4, each=10)), mean, na.rm = T)
+
+hurs_126_sf <- exact_extract(cmip6_126_hurs_global_l, shape, 
+                             'mean', max_cells_in_memory = 93355200 )  
+
+colnames(hurs_126_sf) <- c("hurs_126_2020", "hurs_126_2030", "hurs_126_2040", "hurs_126_2050")
+
+namess <- do.call(paste0, expand.grid(colnames(hurs_126_sf), "_", filter_gcm))
+hurs_126_sf <- bind_cols(rep(hurs_126_sf, 14))
+colnames(hurs_126_sf) <- namess
+
+###
+
+cmip6 <- "L:/falchetta/humidity_cmip"
+
+cmip6_245_hurs_global_l <- list.files(cmip6, pattern = ".nc", full.names = T, recursive = F)
+cmip6_245_hurs_global_l <- cmip6_245_hurs_global_l[grepl("245", cmip6_245_hurs_global_l)]
+cmip6_245_hurs_global_l <- cmip6_245_hurs_global_l[!grepl("json", cmip6_245_hurs_global_l)]
+cmip6_245_hurs_global_l <- stack(lapply(cmip6_245_hurs_global_l, raster, band=10))
+
+cmip6_245_hurs_global_l <- rotate(cmip6_245_hurs_global_l)
+
+cmip6_245_hurs_global_l <- stackApply(cmip6_245_hurs_global_l, rep(2015:2055, each=12), mean, na.rm = T)
+cmip6_245_hurs_global_l <- stackApply(cmip6_245_hurs_global_l, c(1, rep(1:4, each=10)), mean, na.rm = T)
+
+hurs_245_sf <- exact_extract(cmip6_245_hurs_global_l, shape, 
+                             'mean', max_cells_in_memory = 93355200 )  
+
+colnames(hurs_245_sf) <- c("hurs_245_2020", "hurs_245_2030", "hurs_245_2040", "hurs_245_2050")
+
+namess <- do.call(paste0, expand.grid(colnames(hurs_245_sf), "_", filter_gcm))
+hurs_245_sf <- bind_cols(rep(hurs_245_sf, 14))
+colnames(hurs_245_sf) <- namess
+
+###
+
+cmip6 <- "L:/falchetta/humidity_cmip"
+
+cmip6_370_hurs_global_l <- list.files(cmip6, pattern = ".nc", full.names = T, recursive = F)
+cmip6_370_hurs_global_l <- cmip6_370_hurs_global_l[grepl("370", cmip6_370_hurs_global_l)]
+cmip6_370_hurs_global_l <- cmip6_370_hurs_global_l[!grepl("json", cmip6_370_hurs_global_l)]
+cmip6_370_hurs_global_l <- stack(lapply(cmip6_370_hurs_global_l, raster, band=10))
+cmip6_370_hurs_global_l <- rotate(cmip6_370_hurs_global_l)
+cmip6_370_hurs_global_l <- stackApply(cmip6_370_hurs_global_l, rep(2015:2055, each=12), mean, na.rm = T)
+cmip6_370_hurs_global_l <- stackApply(cmip6_370_hurs_global_l, c(1, rep(1:4, each=10)), mean, na.rm = T)
+
+hurs_370_sf <- exact_extract(cmip6_370_hurs_global_l, shape, 
+                             'mean', max_cells_in_memory = 93355200 )  
+
+colnames(hurs_370_sf) <- c("hurs_370_2020", "hurs_370_2030", "hurs_370_2040", "hurs_370_2050")
+
+namess <- do.call(paste0, expand.grid(colnames(hurs_370_sf), "_", filter_gcm))
+hurs_370_sf <- bind_cols(rep(hurs_370_sf, 14))
+colnames(hurs_370_sf) <- namess
+
+
+###
+
+cmip6 <- "L:/falchetta/humidity_cmip"
+
+cmip6_585_hurs_global_l <- list.files(cmip6, pattern = ".nc", full.names = T, recursive = F)
+cmip6_585_hurs_global_l <- cmip6_585_hurs_global_l[grepl("585", cmip6_585_hurs_global_l)]
+cmip6_585_hurs_global_l <- cmip6_585_hurs_global_l[!grepl("json", cmip6_585_hurs_global_l)]
+cmip6_585_hurs_global_l <- stack(lapply(cmip6_585_hurs_global_l, raster, band=10))
+cmip6_585_hurs_global_l <- rotate(cmip6_585_hurs_global_l)
+cmip6_585_hurs_global_l <- stackApply(cmip6_585_hurs_global_l, rep(2015:2055, each=12), mean, na.rm = T)
+cmip6_585_hurs_global_l <- stackApply(cmip6_585_hurs_global_l, c(1, rep(1:4, each=10)), mean, na.rm = T)
+
+hurs_585_sf <- exact_extract(cmip6_585_hurs_global_l, shape, 
+                             'mean', max_cells_in_memory = 93355200 )  
+
+colnames(hurs_585_sf) <- c("hurs_585_2020", "hurs_585_2030", "hurs_585_2040", "hurs_585_2050")
+
+namess <- do.call(paste0, expand.grid(colnames(hurs_585_sf), "_", filter_gcm))
+hurs_585_sf <- bind_cols(rep(hurs_585_sf, 14))
+colnames(hurs_585_sf) <- namess
+
+hurs_585_sf
+
+####
+
+shape <- bind_cols(shape, hurs_hist_sf, hurs_126_sf, hurs_245_sf, hurs_370_sf, hurs_585_sf)
+
+####
+
+# add prices
+
+setwd("")
+
+library(readxl)
+prices_ely <- read_xlsx("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/supporting_data/ely_prices.xlsx")
+
+prices_ely$ctr <- prices_ely$`Country code`
+
+# convert to 2011 PPP
+
+library(wbstats)
+
+ppp <- wb(indicator = "PA.NUS.PPP")
+ppp <- group_by(ppp, iso2c) %>% dplyr::summarise(value=value[date==2021]/value[date==2011])
+
+prices_ely <- merge(prices_ely, ppp, by.x="ctr", by.y="iso2c")
+
+prices_ely$elyprc <- prices_ely$`Average price of 1KW/h (USD)` * prices_ely$value
+
+prices_ely <- dplyr::select(prices_ely, ctr, elyprc)
+
+shape <- merge(shape, prices_ely, by.x="ISO2", by.y="ctr", all.x=T)
+
+###
+
+# NA inputation
+
+library(imputeTS)
+library(missRanger)
+
+c <- st_coordinates(st_centroid(shape))
+bb <- bind_cols(shape$elyprc, as.data.frame(c))
+bb <-missRanger::missRanger(bb, seed = 1234, data_only=T)
+
+shape$elyprc <- bb$...1
+
+shape$elyprc[is.na(shape$ISO3)] <- NA
+
+###
+
+shape_nogeo <- shape %>% st_set_geometry(NULL)
+
+which_nas <- lapply(1:ncol(shape_nogeo), function(X){sum(is.na(shape_nogeo[!is.na(shape_nogeo$ISO3),X]))})
+names(which_nas) <- colnames(shape_nogeo)
+
+###
+
 save(shape, file=paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline_v2.Rds"))
 
+##########################
+##########################
 ##########################
 
 model1 <- gsub("hdd_18_global_mid_370_", "", basename(cmip6_370_hdd18_global_l))

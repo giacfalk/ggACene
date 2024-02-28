@@ -50,15 +50,40 @@ if (user=='gf_server') {
 data <- paste(stub,'6-Projections/results/regressions/for_projections', sep='')
 output <- paste(stub,'6-Projections/results/regressions/', sep='')
 
+setwd(stub)
+
 # Load country data
-load("results/global_wgt_dmcf.RData")
+load("6-Projections/rscripts/global_spline/results/global_wgt_dmcf.RData")
 
 global = reg_ely$data
+global <- as.data.frame(global)
+
+###
+
+l <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/climate/processed/hurs", pattern="rds", full.names = T)
+l <- lapply(l, read_rds)
+
+for(i in 1:length(l)){
+  print(i)
+  l[[i]] <- dplyr::select(l[[i]], state, country, hurs)
+}
+
+l <- dplyr::bind_rows(l)
+l <- group_by(l, country, state) %>% dplyr::summarise(hurs=mean(hurs,na.rm=T))
+
+global_bk <- global
+global$country <- as.character(global$country)
+global$id <- 1:nrow(global)
+global <- merge(global, l, by.x=c("country", "adm1"), by.y=c("country", "state"))
+global <- global[!duplicated(global$id),]
+global$id <- NULL
+
+###
 
 not_all_na <- function(x) any(!is.na(x))
 not_any_na <- function(x) all(!is.na(x))
 
-global <- dplyr::select(global, country, ac, ln_ely_q, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, n_members, weight)
+global <- dplyr::select(global, country, ac, ln_ely_q, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, n_members, ely_p_usd_2011, weight, hurs)
 
 global <- dplyr::select(global, where(not_all_na))
 
@@ -112,7 +137,7 @@ global$macroregion <- countrycode::countrycode(global$country, 'country.name', '
 # global <- filter(global, n_members<10)
 # global <- filter(global, age_head<99)
 
-global <- global %>% group_by(country) %>% filter_if(is.numeric, all_vars(between(., quantile(., .01), quantile(., .99))))
+global <- global %>% group_by(country) %>% filter_if(is.numeric, all_vars(between(., quantile(., .01, na.rm=T), quantile(., .99, na.rm=T))))
 
 global$mean_CDD18_db <- log((global$mean_CDD18_db*100)+1)
 global$mean_HDD18_db <- log((global$mean_HDD18_db*100)+1)
@@ -208,11 +233,11 @@ library(caret)
 library(parallel)
 library(doParallel)
 
-global_ac_train_s1 <- dplyr::select(global_ac_train, ac, macroregion, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, weight)
+global_ac_train_s1 <- dplyr::select(global_ac_train, ac, macroregion, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, ely_p_usd_2011, weight, hurs)
 
 #global_ac_train_s1 <- dplyr::select(global_ac_train, ac, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2,  age_head, inc_q, cdd_q, hdd_q, weight)
 
-global_ac_test_s1 <- dplyr::select(global_ac_test, ac, macroregion, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, weight)
+global_ac_test_s1 <- dplyr::select(global_ac_test, ac, macroregion, country, mean_CDD18_db, mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, ely_p_usd_2011, weight, hurs)
 
 
 #model_weights <- global_ac_train$weight
@@ -226,7 +251,7 @@ global_ac_test_s1 <- dplyr::select(global_ac_test, ac, macroregion, country, mea
 
 # Enable multithread support
 # cores_2_use <- floor(0.65*detectCores())
-# cl <- makeCluster(cores_2_use, outfile = "parallel_log3.txt")
+# cl <- makeCluster(cores_2_use, outfile = "parallel_log4.txt")
 # registerDoParallel(cl)
 
 ###
@@ -323,6 +348,8 @@ rrfFit_ac_gam <- caret::train(ac ~ .,
                 na.action = na.omit,
                 maximize = T)
 
+
+
 # Print CV accuracy
 print(rrfFit_ac_gam)
 
@@ -333,7 +360,9 @@ library(rpart.plot)
 
 fit.tree = rpart(ac ~ ., data=as.data.frame(global_ac_train_s1), method = "class", cp=0.008)
 
-png("results/graphs_tables/cart_tree.png", height = 1200, width = 1000)
+setwd("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/results/graphs_tables")
+
+png("cart_tree.png", height = 1200, width = 1000)
 rpart.plot(fit.tree)
 dev.off()
 
@@ -353,7 +382,7 @@ global_ac_test$phat0_obs <- predict(ac_model_glm, newdata=global_ac_test_s1, typ
 
 ####################################################
 
-global_ac_train_s2 <- dplyr::select(global_ac_train, country, macroregion, ln_ely_q, phat0_obs, mean_CDD18_db,  mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, weight)
+global_ac_train_s2 <- dplyr::select(global_ac_train, country, macroregion, ln_ely_q, phat0_obs, mean_CDD18_db,  mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, ely_p_usd_2011, weight, hurs)
 
 folds <- 10
 
@@ -390,12 +419,14 @@ global_ac_test$phat0_obs <- predict(ac_model_gam, newdata=global_ac_test_s1, typ
 
 ################
 
-global_ac_train_s2 <- dplyr::select(global_ac_train, country, macroregion, ln_ely_q, phat0_obs, mean_CDD18_db,  mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, weight)
+global_ac_train_s2 <- dplyr::select(global_ac_train, country, macroregion, ln_ely_q, phat0_obs, mean_CDD18_db,  mean_HDD18_db, ln_total_exp_usd_2011, urban_sh, edu_head_2, age_head, ely_p_usd_2011, weight, hurs)
 
 tgrid <- expand.grid(
   select = c("TRUE", "FALSE"),
   method = c("GCV.Cp")
 )
+
+global_ac_train_s2$country <- NULL
 
 rrfFit_ely_gam <- caret::train(ln_ely_q ~ .,
                     data = as.data.frame(global_ac_train_s2),
@@ -424,8 +455,8 @@ training_kappa_ac_gam <- psych::cohen.kappa(table(factor(predict(rrfFit_ac_gam, 
 testing_kappa_ac_gam <- psych::cohen.kappa(table(factor(predict(rrfFit_ac_gam, global_ac_test_s1), ordered = T), factor(global_ac_test_s1$ac, ordered = T)))$kappa
 
 setwd("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline")
-load("results/xgboost_models.Rdata")
-load("results/xgboost_models_benchmarks.Rdata")
+load("results/xgboost_models_jan24.Rdata")
+load("results/xgboost_models_benchmarks_jan24.Rdata")
 
 training_acc_ac_rf <- auc(roc(factor(ac_model$trainingData$.outcome, ordered = T), factor(predict(ac_model, ac_model$trainingData), ordered = T)))
 testing_acc_ac_rf <- auc(roc(factor(global_ac_test_s1$ac, ordered = T), factor(predict(ac_model, global_ac_test_s1), ordered = T)))
@@ -464,7 +495,7 @@ testing_mse_ely_gam <- mse(global_ac_test$ln_ely_q, predict(rrfFit_ely_gam, glob
 training_r2_ely_rf <- cor(ely_model$trainingData$.outcome, predict(ely_model, ely_model$trainingData))^2
 testing_r2_ely_rf <- max(ely_model$results$Rsquared)
 
-training_mse_ely_rf <-  mse(ely_model$trainingData$.outcome, predict(ely_model))
+training_mse_ely_rf <-  mse(ely_model$trainingData$.outcome, predict(ely_model, ely_model$trainingData))
 testing_mse_ely_rf <- ely_model$finalModel$prediction.error
 
 ####

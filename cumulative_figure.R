@@ -276,8 +276,8 @@ a = ggplot()+
   geom_line(data=drg2, aes(x=pct_chg_cons_AC_SSP5*100, y=(cumsum(pop_ssps_data_ssp5_2050*SSP5.2050)/1e9), colour="SSP585"))+
   xlab("Percentage (%) change in AC-driven \nelectricity consumption")+
   ylab("People with AC (cumulative, billions)")+
-  scale_colour_manual(name="", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209"))+
-  scale_fill_manual(name="", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209"))+
+  scale_colour_manual(name="", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))+
+  scale_fill_manual(name="", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))+
   scale_x_continuous(breaks = c(0, 25, 50, 75, 100), labels=c("0", "25", "50", "75", "100+"))+
   theme(legend.position = "none", legend.direction = "horizontal")
 
@@ -580,8 +580,8 @@ b = ggplot()+
   geom_ribbon(data=drg2_qq, aes(x=pct_chg_cons_AC_SSP5_q1, ymin=cs_q1, ymax=cs_q3, fill="SSP585"), alpha=0.1)+
   xlab("Change in AC-driven electricity consumption (kWh/hh/yr), 2020-2050")+
   ylab("Population with AC (cumulative, billions)")+
-  scale_colour_manual(name="", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209"))+
-  scale_fill_manual(name="", values=c("#fcec8d", "#ffbe0a", "#ff9830", "#b51209"))+
+  scale_colour_manual(name="", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))+
+  scale_fill_manual(name="", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))+
   xlim(0, 3000)+
   theme(legend.position = "bottom", legend.direction = "horizontal")
 

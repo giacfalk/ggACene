@@ -74,6 +74,28 @@ median(as.numeric(acglobtot)[3:6])
 
 #
 
+
+acglobtot = dplyr::group_by(shape_ac, region) %>% dplyr::summarise(SSP2.2010=sum(SSP2.2010* pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2020=sum(SSP2.2020* pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050=sum(SSP2.2050* pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050=sum(SSP5.2050* pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2050=sum(SSP1.2050* pop_ssps_data_ssp1_2050, na.rm=T), SSP3.2050=sum(SSP3.2050* pop_ssps_data_ssp3_2050, na.rm=T))
+
+acglobtot <- bind_cols(acglobtot[,1], acglobtot[,c(2:7)] / 1e6)
+
+acglobtot[,8] <- (rowMeans(acglobtot[,c(4:7)]) / acglobtot[,3]) - 1
+
+colnames(acglobtot)[8] <- "growth"
+
+arrange(acglobtot, growth)
+
+
+acglobtot[,9] <- rowMeans(acglobtot[,c(4:7)]) - acglobtot[,3] 
+
+colnames(acglobtot)[9] <- "abs"
+
+arrange(acglobtot, abs)
+
+dplyr::group_by(shape_ac, region) %>% dplyr::summarise(SSP1.2050=sum(pop_ssps_data_ssp1_2050, na.rm=T)/1e6)
+
+#
+
 acglobtotHH = dplyr::group_by(shape_ac) %>% dplyr::summarise(SSP2.2010=sum(SSP2.2010* pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2020=sum(SSP2.2020* pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050=sum(SSP2.2050* pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050=sum(SSP5.2050* pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2050=sum(SSP1.2050* pop_ssps_data_ssp1_2050, na.rm=T), SSP3.2050=sum(SSP3.2050* pop_ssps_data_ssp3_2050, na.rm=T))
 
 acglobtotHH/1e9
@@ -128,3 +150,4 @@ paths$level <- as.factor(paths$level)
 
 paths %>% filter(type=="Global") %>% filter(decile==1)
 paths %>% filter(type=="Global") %>% filter(decile==5)
+

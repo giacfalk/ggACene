@@ -73,7 +73,7 @@ if (user=='gf_server') {
 
 setwd(paste0(stub, "rscripts/global_spline"))
 
-load(paste0(stub, "rscripts/global_spline/results/xgboost_models.Rdata"))
+load(paste0(stub, "rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
 
 ##############
 
@@ -111,10 +111,16 @@ library(patchwork)
 a + (b + c + d + e)
 
 ggsave("results/graphs_tables/s1_reg.png", width=10, height=7, scale=1.3)
-
+    
 #
 
-sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)
+shp<-shp[,-8]
+shp$X$weight <- NULL
+shp<-shp[,-1]
+shp$X$macroregion <- NULL
+
+sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)+
+  scale_y_discrete(labels=rev(c("Per-capita expenditure", "HDDs", "Rel. humidity", "CDDs", "Electricity price", "Urbanisation", "Education level", "Age")))
 
 ggsave("results/graphs_tables/s1.png", width=7, height=7, scale=1)
 
@@ -125,7 +131,7 @@ pfun <- function(object, newdata) {
   predict(object, data = newdata)$predictions
 }
 
-x <- dplyr::select(global_ac_train_s2, -ln_ely_q, -ln_ely_q_predicted)
+x <- dplyr::select(global_ac_train_s2, -ln_ely_q)
 
 # Compute fast (approximate) Shapley values using 10 Monte Carlo repetitions
 set.seed(5038)
@@ -163,6 +169,12 @@ sv_dependence(shp, color_var = "mean_CDD18_db", v="mean_HDD18_db")+
 
 #
 
-sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)
+shp<-shp[,-9]
+shp$X$weight <- NULL
+shp<-shp[,-1]
+shp$X$macroregion <- NULL
+
+sv_importance(shp, kind = "beeswarm", show_numbers = TRUE)+
+  scale_y_discrete(labels=rev(c("AC", "Per-capita expenditure", "Electricity price", "HDDs", "Rel. humidity", "Urbanisation", "CDDs", "Age", "Education level")))
 
 ggsave("results/graphs_tables/s2.png", width=7, height=7, scale=1)
