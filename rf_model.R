@@ -28,25 +28,7 @@ library(lspline)
 library(pROC)
 library(pbapply)
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-data <- paste(stub,'6-Projections/results/regressions/for_projections', sep='')
-output <- paste(stub,'6-Projections/results/regressions/', sep='')
+setwd(wd)
 
 # Load country data
 load("results/global_wgt_dmcf.RData")
@@ -56,7 +38,7 @@ global <- as.data.frame(global)
 
 ###
 
-l <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/climate/processed/hurs", pattern="rds", full.names = T)
+l <- list.files(path="hurs", pattern="rds", full.names = T)
 l <- lapply(l, read_rds)
 
 for(i in 1:length(l)){
@@ -91,7 +73,7 @@ gc()
 
 # adjustment expenditure to gdp per capita
 
-adj_gtap <- read.csv("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/adj_gtap/exp_gdp_capita_markups.csv")
+adj_gtap <- read.csv("adj_gtap/exp_gdp_capita_markups.csv")
 
 adj_gtap$REG <- toupper(adj_gtap$REG)
 
@@ -101,23 +83,9 @@ global <- merge(global, adj_gtap, by.x="iso3c", by.y="REG")
 
 #global$ln_total_exp_usd_2011 <- log(exp(global$ln_total_exp_usd_2011) / global$markup)
 
-# add a macroregion variable
+setwd(wd)
 
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-load(paste0(stub, "6-Projections/rscripts/global_spline/supporting_data/adj_factors.Rds"))
+load(paste0(wd, "supporting_data/adj_factors.Rds"))
 
 ss <- dplyr::select(ss, country, region)
 colnames(ss)[2] <- "macroregion"
@@ -549,7 +517,7 @@ rm(rrfFit_ely)
 training_acc_ac <- as.numeric(training_acc_ac)
 testing_acc_ac <- as.numeric(testing_acc_ac)
 
-save("training_acc_ac", "testing_acc_ac", "varImp_tr", "varImp_test", "r2_train", "r2_test", file=paste0(stub, "6-Projections/rscripts/global_spline/results/xgboost_models_benchmarks_jan24.Rdata"))
+save("training_acc_ac", "testing_acc_ac", "varImp_tr", "varImp_test", "r2_train", "r2_test", file=paste0(wd, "results/xgboost_models_benchmarks_jan24.Rdata"))
 
 #
 
@@ -557,7 +525,7 @@ global = bind_rows(global_ac_train, global_ac_test)
 
 #
 
-save("ac_model", "ely_model", "rrfFit_ac_shapely", "rrfFit_ely_shapely", "global_ac_train_s1", "global_ac_train_s2", "global", "global_ac", "terc_inc", "terc_cdd", "terc_hdd", file=paste0(stub, "6-Projections/rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
+save("ac_model", "ely_model", "rrfFit_ac_shapely", "rrfFit_ely_shapely", "global_ac_train_s1", "global_ac_train_s2", "global", "global_ac", "terc_inc", "terc_cdd", "terc_hdd", file=paste0(wd, "results/xgboost_models_jan24.Rdata"))
 
 ###
 
@@ -636,4 +604,4 @@ val_1_te <- ggplotConfusionMatrix2(cfm_te)
 
 val_1_tr + val_1_te + val_2_tr + val_2_te + plot_layout(ncol=2)
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/results/graphs_tables/accuracy_plot_jan24.png", scale=1.5, height = 5, width = 7)
+ggsave("results/graphs_tables/accuracy_plot_jan24.png", scale=1.5, height = 5, width = 7)

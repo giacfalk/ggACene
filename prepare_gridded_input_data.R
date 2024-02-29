@@ -3,7 +3,7 @@
 ##      1) creates the gridded dataset of expenditure, CDDs/HDDs, and age, gender and sex which will be used to produce global gridded projection of future AC uptake and utilisation
 
 
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
 ## 1) Load libraries and data ##
@@ -39,21 +39,13 @@ library(stars)
 
 ####
 
-# Set users
-user <- 'gf'
-
-if (user=='gf') {
-  stub <- "F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/"
-}
-
-#
+setwd(wd)
 
 ###
 
-setwd(paste0(stub, "data/projections/new_data_jan_2022"))
 
 # gdp downscaled (SSPS)
-gdp_ssps <- list.files(path="gdp_downscaled_ssps", recursive = T, pattern="tif", full.names = T)
+gdp_ssps <- list.files(path="supporting_data/gdp_downscaled_ssps", recursive = T, pattern="tif", full.names = T)
 
 gdp_ssps_data <- lapply(gdp_ssps, raster)
 gdp_ssps_data <- split(gdp_ssps_data, rep(1:5, each=26))
@@ -69,7 +61,7 @@ for (i in 1:5){
 }
 
 # pop downscaled (SSPS)
-pop_ssps <- list.files(path="pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path="supporting_data/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
 pop_ssps_data <- lapply(pop_ssps, stack)
 
 for (i in 1:5){
@@ -126,7 +118,7 @@ shape <- shape[order(shape$id),]
 
 #
 
-adm1 <- read_sf("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/supporting_data/gadm_410-gpkg/gadm_410-levels.gpkg", layer = "ADM_1")
+adm1 <- read_sf("supporting_data/gadm_410-gpkg/gadm_410-levels.gpkg", layer = "ADM_1")
 st_crs(adm1) <- 4326
 
 rename_geometry <- function(g, name){
@@ -220,11 +212,7 @@ shape_all <- st_as_sf(shape_all)
 ##################################
 
 # Set directories
-output <- paste(stub,'data/projections/climate/processed/cdd_18/', sep='')
-shp_dir <- paste(stub,'data/shapefiles/globalentina/', sep='')
-pop_dir <- paste(stub,'data/climate/population/', sep='') 
-poppj_dir <- paste(stub,'data/projections/new_data_jan_2022/pop_downscaled_spps/', sep='') 
-gldas <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/Data/GLDAS_hdd_cdd/netcdf/cdd/18_deg/annual/"
+gldas <- "supporting_data/"
 
 #cross calibrate CDDs/HDDs with GLDAS historical
 
@@ -240,18 +228,18 @@ CDD_glas_hist_sf <- exact_extract(cmip6_hist_cdd18_global, shape,
 
 CDD_glas_hist_sf$geometry <- NULL
 
-######################################################################
+######################################################################	
 
 #             CMIP6 Projections of Gridded Climate Data              #
 
 ######################################################################
 
 ##########
-filter_gcm <- na.omit(readxl::read_xlsx("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/projections/climate/CMIP6_medians/hausfather_hot_model_cmip6.xlsx", skip = 2)[,22])
+filter_gcm <- na.omit(readxl::read_xlsx("supporting_data/hausfather_hot_model_cmip6.xlsx", skip = 2)[,22])
 filter_gcm <- filter_gcm$`TCR likely + ECS likely + GDDP`
 ###########
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/CDDs_18deg/hist"
+cmip6 <- "supporting_data/CDDs_18deg/hist"
 
 cmip6_hist_cdd18_global_l <- list.files(cmip6, pattern = ".nc", full.names = T)
 cmip6_hist_cdd18_global_l <- cmip6_hist_cdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_hist_cdd18_global_l)]
@@ -297,7 +285,7 @@ colnames(CDD_hist_sf_mean) <- gsub(".nc", "", gsub("cdd_18_global_hist_", "", ba
 ## CMIP6 Projections CDD - SSP2 RCP4.5
 # Load netcdf file
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/CDDs_18deg/fut"
+cmip6 <- "supporting_data/CDDs_18deg/fut"
 
 cmip6_245_cdd18_global_l <- list.files(cmip6, pattern = "245", full.names = T)
 cmip6_245_cdd18_global_l <- cmip6_245_cdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_245_cdd18_global_l)]
@@ -355,7 +343,7 @@ CDD_245_sf[CDD_245_sf<0] <- 0
 
 ## CMIP6 Projections CDD - SSP5 RCP8.5
 # Load netcdf file
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/CDDs_18deg/fut"
+cmip6 <- "supporting_data/CDDs_18deg/fut"
 
 cmip6_585_cdd18_global_l <- list.files(cmip6, pattern = "585", full.names = T)
 cmip6_585_cdd18_global_l <- cmip6_585_cdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_585_cdd18_global_l)]
@@ -414,7 +402,7 @@ CDD_585_sf[CDD_585_sf<0] <- 0
 ## CMIP6 Projections CDD - SSP1 RCP2.6
 # Load netcdf file
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/CDDs_18deg/fut"
+cmip6 <- "supporting_data/CDDs_18deg/fut"
 
 cmip6_126_cdd18_global_l <- list.files(cmip6, pattern = "126", full.names = T)
 cmip6_126_cdd18_global_l <- cmip6_126_cdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_126_cdd18_global_l)]
@@ -479,7 +467,7 @@ CDD_126_sf[CDD_126_sf<0] <- 0
 ## CMIP6 Projections CDD - SSP1 RCP2.6
 # Load netcdf file
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/CDDs_18deg/fut"
+cmip6 <- "supporting_data/CDDs_18deg/fut"
 
 cmip6_370_cdd18_global_l <- list.files(cmip6, pattern = "370", full.names = T)
 cmip6_370_cdd18_global_l <- cmip6_370_cdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_370_cdd18_global_l)]
@@ -550,7 +538,7 @@ colnames(CDD_370_sf) <- gsub("mean.X", "CDD_370_", colnames(CDD_370_sf))
 
 ##########
 
-gldas <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/Data/GLDAS_hdd_cdd/netcdf/hdd/18_deg/annual/"
+gldas <- "supporting_data/"
 
 #cross calibrate HDDs/HDDs with GLDAS historical
 
@@ -568,20 +556,13 @@ HDD_glas_hist_sf$geometry <- NULL
 
 ###
 
-# Set directories
-cmip6 <- paste(stub,'data/projections/climate/CMIP6_medians/18/', sep='')
-output <- paste(stub,'data/projections/climate/processed/hdd_18/', sep='')
-shp_dir <- paste(stub,'data/shapefiles/globalentina/', sep='')
-pop_dir <- paste(stub,'data/climate/population/', sep='') 
-poppj_dir <- paste(stub,'data/projections/new_data_jan_2022/pop_downscaled_spps/', sep='') 
-
 ######################################################################
 
 #             CMIP6 Projections of Gridded Climate Data              #
 
 ######################################################################
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/HDDs_18deg/hist"
+cmip6 <- "supporting_data/HDDs_18deg/hist"
 
 cmip6_hist_hdd18_global_l <- list.files(cmip6, pattern = ".nc", full.names = T)
 cmip6_hist_hdd18_global_l <- cmip6_hist_hdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_hist_hdd18_global_l)]
@@ -627,7 +608,7 @@ colnames(HDD_hist_sf_mean) <- gsub(".nc", "", gsub("hdd_18_global_hist_", "", ba
 ## CMIP6 Projections HDD - SSP2 RCP4.5
 # Load netcdf file
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/HDDs_18deg/fut"
+cmip6 <- "supporting_data/HDDs_18deg/fut"
 
 cmip6_245_hdd18_global_l <- list.files(cmip6, pattern = "245", full.names = T)
 cmip6_245_hdd18_global_l <- cmip6_245_hdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_245_hdd18_global_l)]
@@ -685,7 +666,7 @@ HDD_245_sf[HDD_245_sf<0] <- 0
 
 ## CMIP6 Projections HDD - SSP5 RCP8.5
 # Load netcdf file
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/HDDs_18deg/fut"
+cmip6 <- "supporting_data/HDDs_18deg/fut"
 
 cmip6_585_hdd18_global_l <- list.files(cmip6, pattern = "585", full.names = T)
 cmip6_585_hdd18_global_l <- cmip6_585_hdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_585_hdd18_global_l)]
@@ -744,7 +725,7 @@ HDD_585_sf[HDD_585_sf<0] <- 0
 ## CMIP6 Projections HDD - SSP1 RCP2.6
 # Load netcdf file
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/HDDs_18deg/fut"
+cmip6 <- "supporting_data/HDDs_18deg/fut"
 
 cmip6_126_hdd18_global_l <- list.files(cmip6, pattern = "126", full.names = T)
 cmip6_126_hdd18_global_l <- cmip6_126_hdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_126_hdd18_global_l)]
@@ -807,7 +788,7 @@ HDD_126_sf[HDD_126_sf<0] <- 0
 ## CMIP6 Projections HDD - SSP1 RCP2.6
 # Load netcdf file
 
-cmip6 <- "F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CMIP6_all/HDDs_18deg/fut"
+cmip6 <- "supporting_data/HDDs_18deg/fut"
 
 cmip6_370_hdd18_global_l <- list.files(cmip6, pattern = "370", full.names = T)
 cmip6_370_hdd18_global_l <- cmip6_370_hdd18_global_l[grepl(paste(filter_gcm, collapse = "|"), cmip6_370_hdd18_global_l)]
@@ -1056,7 +1037,7 @@ colnames(shape)[5:29] <- paste0(v$Var1, v$Var2, v$Var5, v$Var4, v$Var3)
 
 # add humidity
 
-# load(paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline_v2.Rds"))
+# load(paste0(wd, "/supporting_data/data_for_global_spline_v2.Rds"))
 
 cmip6 <- "L:/falchetta/humidity_cmip"
 
@@ -1178,10 +1159,10 @@ shape <- bind_cols(shape, hurs_hist_sf, hurs_126_sf, hurs_245_sf, hurs_370_sf, h
 
 # add prices
 
-setwd("")
+setwd(wd)
 
 library(readxl)
-prices_ely <- read_xlsx("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/supporting_data/ely_prices.xlsx")
+prices_ely <- read_xlsx("supporting_data/ely_prices.xlsx")
 
 prices_ely$ctr <- prices_ely$`Country code`
 
@@ -1224,7 +1205,7 @@ names(which_nas) <- colnames(shape_nogeo)
 
 ###
 
-save(shape, file=paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline_v2.Rds"))
+save(shape, file=paste0(wd, "/supporting_data/data_for_global_spline_v2.Rds"))
 
 ##########################
 ##########################
@@ -1238,4 +1219,4 @@ model <- gsub(".nc", "", model)
 
 models_list <- intersect(model, model1)
 
-save(models_list, file=paste0(stub, "rscripts/global_spline/supporting_data/models_list.Rds"))
+save(models_list, file=paste0(wd, "/supporting_data/models_list.Rds"))

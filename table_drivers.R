@@ -7,6 +7,8 @@ library(sf)
 #library(gg.layers)
 ####
 
+setwd(wd)
+
 load("supporting_data/data_for_global_spline_v2.Rds")
 
 ############

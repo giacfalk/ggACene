@@ -1,4 +1,4 @@
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
 ## This R-script:
@@ -52,26 +52,7 @@ library(ROCR)
 library(lspline)
 library(patchwork)
 
-####
-
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-setwd(paste0(stub, "rscripts/global_spline"))
+setwd(wd)
 
 ##############
 
@@ -79,9 +60,9 @@ setwd(paste0(stub, "rscripts/global_spline"))
 
 ###
 
-load(paste0(stub, "rscripts/global_spline/results/xgboost_models_benchmarks_jan24.Rdata"))
-load(paste0(stub, "rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
-load(paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline_v2.Rds"))
+load(paste0(wd, "results/xgboost_models_benchmarks_jan24.Rdata"))
+load(paste0(wd, "results/xgboost_models_jan24.Rdata"))
+load(paste0(wd, "supporting_data/data_for_global_spline_v2.Rds"))
 
 ###
 
@@ -99,7 +80,7 @@ load(paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline
 
 ###
 
-adj_gtap <- read.csv("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/adj_gtap/exp_gdp_capita_markups.csv")
+adj_gtap <- read.csv("adj_gtap/exp_gdp_capita_markups.csv")
 
 adj_gtap$REG <- toupper(adj_gtap$REG)
 
@@ -165,7 +146,7 @@ wrld_simpl <- st_as_sf(wrld_simpl)
 wrld_simpl_hhsize = base::merge(wrld_simpl, hhsize, by.x="ISO3", by.y="Country", all.x=T)
 wrld_simpl_hhsize$value = ifelse(is.na(wrld_simpl_hhsize$value), mean(wrld_simpl_hhsize$value, na.rm=T), wrld_simpl_hhsize$value)
 
-pop_ssps <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/projections/new_data_jan_2022/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path="supporting_data/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
 pop_ssps_data <- lapply(pop_ssps, stack)
 
 wrld_simpl_hhsize = fasterize::fasterize(st_as_sf(wrld_simpl_hhsize), pop_ssps_data[[2]][[1]], field="value")
@@ -180,7 +161,7 @@ output3 <- list()
 
 # loop for all ssps and time-steps
 
-load(paste0(stub, "rscripts/global_spline/supporting_data/models_list.Rds"))
+load(paste0(wd, "supporting_data/models_list.Rds"))
 cmip6_models <- models_list
 
 ####
@@ -795,7 +776,7 @@ dev.off()
 ###################
 ###################
 
-pop_ssps <- list.files(path=paste0(stub, "data/projections/new_data_jan_2022/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path=paste0(wd, "data/projections/new_data_jan_2022/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
 pop_ssps_data <- stack(pop_ssps[2])[[10]]
 
 #

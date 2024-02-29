@@ -1,7 +1,7 @@
 
 #######
 
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
 # Load packages
@@ -34,24 +34,7 @@ library(sf)
 library(pROC)
 library(pbapply)
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-setwd(paste0(stub, "6-Projections/rscripts/global_spline"))
+setwd(wd)
 
 # descriptive statistics
 #######
@@ -357,7 +340,7 @@ acglobtot = shape_ac %>% dplyr::summarise(SSP2.2010=weighted.mean(SSP2.2010, pop
 
 elyglobtot = dplyr::group_by(shape_ely_diff_m) %>% dplyr::summarise(ely_total_SSP2_2010= sum(cons_AC_SSP2.2010*(SSP2.2010*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050= sum(cons_AC_SSP2.2050*(SSP2.2050*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050= sum(cons_AC_SSP5.2050*SSP5.2050*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP2_2010_q1= sum(cons_AC_SSP2.2010_q1*(SSP2.2010_q1*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050_q1= sum(cons_AC_SSP2.2050_q1*(SSP2.2050_q1*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050_q1= sum(cons_AC_SSP5.2050_q1*SSP5.2050_q1*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP2_2010_q3= sum(cons_AC_SSP2.2010_q3*(SSP2.2010_q3*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050_q3= sum(cons_AC_SSP2.2050_q3*(SSP2.2050_q3*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050_q3= sum(cons_AC_SSP5.2050_q3*SSP5.2050_q3*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9)
 
-save("acglobtot", "elyglobtot", file=paste0(stub, "6-Projections/rscripts/global_spline/results/glob_figures.Rdata"))
+save("acglobtot", "elyglobtot", file=paste0(wd, "/results/glob_figures.Rdata"))
 
 #### 
 

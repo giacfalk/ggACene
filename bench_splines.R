@@ -30,37 +30,19 @@ library(lspline)
 library(pROC)
 library(pbapply)
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
+#
 
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-data <- paste(stub,'6-Projections/results/regressions/for_projections', sep='')
-output <- paste(stub,'6-Projections/results/regressions/', sep='')
-
-setwd(stub)
+setwd(wd)
 
 # Load country data
-load("6-Projections/rscripts/global_spline/results/global_wgt_dmcf.RData")
+load("results/global_wgt_dmcf.RData")
 
 global = reg_ely$data
 global <- as.data.frame(global)
 
 ###
 
-l <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/climate/processed/hurs", pattern="rds", full.names = T)
+l <- list.files(path="hurs", pattern="rds", full.names = T)
 l <- lapply(l, read_rds)
 
 for(i in 1:length(l)){
@@ -93,7 +75,7 @@ gc()
 
 # adjustment expenditure to gdp per capita
 
-adj_gtap <- read.csv("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/adj_gtap/exp_gdp_capita_markups.csv")
+adj_gtap <- read.csv("adj_gtap/exp_gdp_capita_markups.csv")
 
 adj_gtap$REG <- toupper(adj_gtap$REG)
 
@@ -105,21 +87,9 @@ global <- merge(global, adj_gtap, by.x="iso3c", by.y="REG")
 
 # add a macroregion variable
 
-user <- 'gf_server'
+setwd(wd)
 
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-load(paste0(stub, "6-Projections/rscripts/global_spline/supporting_data/adj_factors.Rds"))
+load(paste0(wd, "supporting_data/adj_factors.Rds"))
 
 ss <- dplyr::select(ss, country, region)
 colnames(ss)[2] <- "macroregion"
@@ -360,9 +330,7 @@ library(rpart.plot)
 
 fit.tree = rpart(ac ~ ., data=as.data.frame(global_ac_train_s1), method = "class", cp=0.008)
 
-setwd("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/results/graphs_tables")
-
-png("cart_tree.png", height = 1200, width = 1000)
+png("graphs_tables/cart_tree.png", height = 1200, width = 1000)
 rpart.plot(fit.tree)
 dev.off()
 
@@ -454,7 +422,7 @@ testing_acc_ac_gam <- auc(roc(factor(global_ac_test_s1$ac, ordered = T), factor(
 training_kappa_ac_gam <- psych::cohen.kappa(table(factor(predict(rrfFit_ac_gam, global_ac_train_s1), ordered = T), factor(global_ac_train_s1$ac, ordered = T)))$kappa
 testing_kappa_ac_gam <- psych::cohen.kappa(table(factor(predict(rrfFit_ac_gam, global_ac_test_s1), ordered = T), factor(global_ac_test_s1$ac, ordered = T)))$kappa
 
-setwd("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline")
+setwd(wd)
 load("results/xgboost_models_jan24.Rdata")
 load("results/xgboost_models_benchmarks_jan24.Rdata")
 

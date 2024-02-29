@@ -1,5 +1,5 @@
 
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
 # Load packages
@@ -32,24 +32,7 @@ library(sf)
 library(pROC)
 library(pbapply)
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-setwd(paste0(stub, "6-Projections/rscripts/global_spline"))
+setwd(wd)
 
 # quantify cooling gap 
 
@@ -270,7 +253,7 @@ shape_ac <- bind_cols(shape_ac, future_acc_q1, future_acc_q3)
 # emissions figure
 
 require(data.table)
-ci <- fread(paste0(stub, "6-Projections/rscripts/projections/carbon_intensity/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
+ci <- fread(paste0(wd, "supporting_data/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
 
 emis_lab <- unique(ci$Variable)[grep("Electricity", unique(ci$Variable))][88]
 ci_emis <- filter(ci, Variable %in% emis_lab)
@@ -492,7 +475,7 @@ future_acc_q3 <- future_acc
 shape_ac <- bind_cols(shape_ac, future_acc_q1, future_acc_q3)
 
 require(data.table)
-ci <- fread(paste0(stub, "6-Projections/rscripts/projections/carbon_intensity/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
+ci <- fread(paste0(wd, "supporting_data/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
 
 emis_lab <- unique(ci$Variable)[grep("Electricity", unique(ci$Variable))][88]
 ci_emis <- filter(ci, Variable %in% emis_lab)

@@ -1,4 +1,4 @@
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
 ## This R-script:
@@ -54,24 +54,7 @@ library(patchwork)
 
 ####
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-setwd(paste0(stub, "rscripts/global_spline"))
+setwd(wd)
 
 ##############
 
@@ -79,7 +62,7 @@ setwd(paste0(stub, "rscripts/global_spline"))
 
 ###
 
-load(paste0(stub, "rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
+load(paste0(wd, "results/xgboost_models_jan24.Rdata"))
 
 ###
 

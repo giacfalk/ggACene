@@ -1,7 +1,7 @@
 
 library(rmapshaper)
 
-pop_ssps <- list.files(path=paste0(stub, "data/projections/new_data_jan_2022/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path=paste0(wd, "supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
 pop_ssps_data <- stack(pop_ssps[2])[[10]]
 
 data(wrld_simpl)
@@ -201,7 +201,7 @@ ggsave("results/graphs_tables/maps.pdf", height = 5*1.2, width = 5*2, scale=1.35
 
 library(rmapshaper)
 
-pop_ssps <- list.files(path=paste0(stub, "data/projections/new_data_jan_2022/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path=paste0(wd, "supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
 
 data(wrld_simpl)
 wrld_simpl_sf <- st_as_sf(wrld_simpl)

@@ -1,4 +1,4 @@
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
 ## This R-script:
@@ -54,29 +54,12 @@ library(patchwork)
 
 ####
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-setwd(paste0(stub, "rscripts/global_spline"))
+setwd(wd)
 
 ##################################################
 
-data <- paste(stub,'results/regressions/for_projections', sep='')
-output <- paste(stub,'results/regressions/', sep='')
+data <- paste(wd,'results/regressions/for_projections', sep='')
+output <- paste(wd,'results/regressions/', sep='')
 
 # Load country data
 load("results/global_wgt_dmcf.RData")
@@ -87,7 +70,7 @@ global <- as.data.frame(global)
 
 ###
 
-l <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/climate/processed/hurs", pattern="rds", full.names = T)
+l <- list.files(path="hurs", pattern="rds", full.names = T)
 l <- lapply(l, read_rds)
 
 for(i in 1:length(l)){
@@ -120,7 +103,7 @@ gc()
 
 # adjustment expenditure to gdp per capita
 
-adj_gtap <- read.csv("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/adj_gtap/exp_gdp_capita_markups.csv")
+adj_gtap <- read.csv("adj_gtap/exp_gdp_capita_markups.csv")
 
 adj_gtap$REG <- toupper(adj_gtap$REG)
 
@@ -132,21 +115,9 @@ global <- merge(global, adj_gtap, by.x="iso3c", by.y="REG")
 
 # add a macroregion variable
 
-user <- 'gf_server'
+setwd(wd)
 
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-load(paste0(stub, "6-Projections/rscripts/global_spline/supporting_data/adj_factors.Rds"))
+load(paste0(wd, "supporting_data/adj_factors.Rds"))
 
 ss <- dplyr::select(ss, country, region)
 colnames(ss)[2] <- "macroregion"
@@ -217,7 +188,7 @@ global_ac$inc_q <- as.factor(global_ac$inc_q)
 
 # calibrate gridded input data
 
-keep(stub, global, sure=T)
+keep(wd, global, sure=T)
 
 load("supporting_data/data_for_global_spline_v2.Rds")
 
@@ -297,7 +268,7 @@ shape$pop_ssps_data_ssp5_2050 <- shape$pop_ssps_data_ssp5_2050 * adjfact_pop_ssp
 
 ###
 
-keep(shape, sure=T)
+keep(shape, wd, sure=T)
 
 save.image("supporting_data/data_for_global_spline_v2.Rds")
 

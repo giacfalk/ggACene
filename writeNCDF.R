@@ -1,11 +1,11 @@
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
 library(raster)
 library(fasterize)
 library(sf)
 
-setwd("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline")
+setwd(wd)
 
 shape_ac <- readRDS("output_data/shape_ac.Rds")
 shape_ely_diff<- readRDS("output_data/shape_ely_diff.Rds")
@@ -15,7 +15,7 @@ shape_ely_diff<- readRDS("output_data/shape_ely_diff.Rds")
 shape_ac <- dplyr::select(shape_ac, starts_with("SSP"))
 combs <- colnames(shape_ac)
 
-r <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/projections/new_data_jan_2022/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
+r <- list.files(path="supporting_data/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
 r <- lapply(r, stack)
 r <- r[[2]][[1]]
 
@@ -111,7 +111,7 @@ shape_ely_diff<- readRDS("output_data/shape_ely_diff.Rds")
 shape_ely_diff <- dplyr::select(shape_ely_diff, contains("total"))
 combs <- colnames(shape_ely_diff)
 
-r <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/projections/new_data_jan_2022/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
+r <- list.files(path="supporting_data/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
 r <- lapply(r, stack)
 r <- r[[2]][[1]]
 
@@ -205,7 +205,7 @@ shape_ely_diff<- readRDS("output_data/shape_ely_diff.Rds")
 shape_ely_diff <- dplyr::select(shape_ely_diff, contains("pop_ssps"))
 combs <- colnames(shape_ely_diff)
 
-r <- list.files(path="F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/data/projections/new_data_jan_2022/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
+r <- list.files(path="supporting_data/pop_downscaled_spps", recursive = T, pattern="nc", full.names = T)
 r <- lapply(r, stack)
 r <- r[[2]][[1]]
 

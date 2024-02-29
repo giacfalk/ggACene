@@ -1,9 +1,3 @@
-# plot drivers
-
-
-## This R-script:
-##      1) makes global gridded projection of future AC uptake and utilisation based on the global spline models and on the gridded dataset of expenditure, CDDs/HDDs, and age, gender and sex
-
 ## 1) Load libraries and data ##
 library(tidyverse)
 library(reshape2)
@@ -11,25 +5,9 @@ library(sf)
 library(gg.layers)
 ####
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
+setwd(wd)
 
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/'
-}
-
-
-load(paste0(stub, "rscripts/global_spline/supporting_data/data_for_global_spline_v2.Rds"))
+load(paste0(wd, "supporting_data/data_for_global_spline_v2.Rds"))
 
 ############
 
@@ -57,7 +35,7 @@ ggplot(shape_gdp)+
   xlab("Scenario")+
   theme(legend.position = "none")
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/expenditure_evolution.png", scale=2, width = 3, height = 5)
+ggsave("expenditure_evolution.png", scale=2, width = 3, height = 5)
 
 #
 
@@ -100,7 +78,7 @@ ggplot(shape_pop %>% group_by(ssp, year, region) %>% dplyr::summarise(value=sum(
   xlab("Scenario")+
   theme(legend.position = "none")
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/population_evolution.png", scale=2, width = 3, height = 5)
+ggsave("population_evolution.png", scale=2, width = 3, height = 5)
 
 #
 
@@ -145,7 +123,7 @@ ggplot(shape_cdd)+
   theme(legend.position = "none")
 
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/cdd_evolution.png", scale=2.5, width = 8, height = 3)
+ggsave("cdd_evolution.png", scale=2.5, width = 8, height = 3)
 
 #
 
@@ -186,7 +164,7 @@ ggplot(shape_hdd)+
   theme(legend.position = "none")
 
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/hdd_evolution.png", scale=2.5, width = 8, height = 3)
+ggsave("hdd_evolution.png", scale=2.5, width = 8, height = 3)
 
 #
 
@@ -216,7 +194,7 @@ ggplot(shape_age)+
   xlab("Age of population")+
   theme(legend.position = "none")
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/age_evolution.png", scale=2, width = 8, height = 6)
+ggsave("age_evolution.png", scale=2, width = 8, height = 6)
 
 #
 
@@ -246,4 +224,4 @@ ggplot(shape_edu)+
   xlab("Education level of population")+
   theme(legend.position = "none")
 
-ggsave("F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/6-Projections/rscripts/global_spline/edu_evolution.png", scale=2, width = 8, height = 6)
+ggsave("edu_evolution.png", scale=2, width = 8, height = 6)

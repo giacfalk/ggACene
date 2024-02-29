@@ -1,27 +1,10 @@
 # validation plot
 #######
 
-rm(list=ls(all=TRUE)) # Removes all previously created variables
+rm(list=setdiff(ls(), "wd")) # Removes all previously created variables
 gc()                  # frees up memory resources
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-setwd(paste0(stub, "6-Projections/rscripts/global_spline"))
+setwd(wd)
 
 #####
 
@@ -69,27 +52,10 @@ a_plot <- ggplot(shape_ac_s)+
 ###################################
 ###################################
 
-gdata::keep(a_plot, sure = T) # Removes all previously created variables
+gdata::keep(a_plot, wd, sure = T) # Removes all previously created variables
 gc()                  # frees up memory resources
 
-# Set users
-user <- 'fp'
-user <- 'gf'
-user <- 'gf_server'
-
-if (user=='fp') {
-  stub <- 'F:/Il mio Drive/'
-}
-
-if (user=='gf') {
-  stub <- 'H:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-if (user=='gf_server') {
-  stub <- 'F:/.shortcut-targets-by-id/1JhN0qxmpnYQDoWQdBhnYKzbRCVGH_WXE/'
-}
-
-setwd(paste0(stub, "6-Projections/rscripts/global_spline"))
+setwd(wd)
 
 #####
 
@@ -105,9 +71,9 @@ shape_ac_s <- dplyr::group_by(shape_ac, ISO3) %>% dplyr::summarise(SSP2.2010=wei
 
 #
 
-setwd(stub)
+setwd(wd)
 
-validation_data <- readxl::read_xlsx("6-Projections/rscripts/global_spline/supporting_data/ac_statistics.xlsx")
+validation_data <- readxl::read_xlsx("supporting_data/ac_statistics.xlsx")
 
 
 merger <- merge(shape_ac_s, validation_data, by.x="ISO3", by.y="country")
@@ -140,9 +106,9 @@ library(patchwork)
 
 a_plot + b_plot
 
-ggsave("6-Projections/rscripts/global_spline/results/graphs_tables/validation_with_nat_stats.png", scale=1.5, width = 7, height = 4)  
+ggsave("results/graphs_tables/validation_with_nat_stats.png", scale=1.5, width = 7, height = 4)  
 
-setwd(paste0(stub, "6-Projections/rscripts/global_spline"))
+setwd(wd)
 
 merger$bias <- merger$SSP2.2010 - merger$ac
 merger <- dplyr::select(merger, ISO3, bias)
