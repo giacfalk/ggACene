@@ -253,7 +253,7 @@ shape_ac <- bind_cols(shape_ac, future_acc_q1, future_acc_q3)
 # emissions figure
 
 require(data.table)
-ci <- fread(paste0(wd, "supporting_data/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
+ci <- fread(paste0(wd, "/supporting_data/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
 
 emis_lab <- unique(ci$Variable)[grep("Electricity", unique(ci$Variable))][88]
 ci_emis <- filter(ci, Variable %in% emis_lab)
@@ -475,7 +475,7 @@ future_acc_q3 <- future_acc
 shape_ac <- bind_cols(shape_ac, future_acc_q1, future_acc_q3)
 
 require(data.table)
-ci <- fread(paste0(wd, "supporting_data/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
+ci <- fread(paste0(wd, "/supporting_data/AR6_Scenarios_Database_ISO3_v1.0.csv"), header = T)
 
 emis_lab <- unique(ci$Variable)[grep("Electricity", unique(ci$Variable))][88]
 ci_emis <- filter(ci, Variable %in% emis_lab)

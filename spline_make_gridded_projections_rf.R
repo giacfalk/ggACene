@@ -60,9 +60,9 @@ setwd(wd)
 
 ###
 
-load(paste0(wd, "results/xgboost_models_benchmarks_jan24.Rdata"))
-load(paste0(wd, "results/xgboost_models_jan24.Rdata"))
-load(paste0(wd, "supporting_data/data_for_global_spline_v2.Rds"))
+load(paste0(wd, "/results/xgboost_models_benchmarks_jan24.Rdata"))
+load(paste0(wd, "/results/xgboost_models_jan24.Rdata"))
+load(paste0(wd, "/supporting_data/data_for_global_spline_v2.Rds"))
 
 ###
 
@@ -161,7 +161,7 @@ output3 <- list()
 
 # loop for all ssps and time-steps
 
-load(paste0(wd, "supporting_data/models_list.Rds"))
+load(paste0(wd, "/supporting_data/models_list.Rds"))
 cmip6_models <- models_list
 
 ####
@@ -776,7 +776,7 @@ dev.off()
 ###################
 ###################
 
-pop_ssps <- list.files(path=paste0(wd, "data/projections/new_data_jan_2022/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path=paste0(wd, "/supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
 pop_ssps_data <- stack(pop_ssps[2])[[10]]
 
 #

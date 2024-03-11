@@ -117,7 +117,7 @@ global <- merge(global, adj_gtap, by.x="iso3c", by.y="REG")
 
 setwd(wd)
 
-load(paste0(wd, "supporting_data/adj_factors.Rds"))
+load(paste0(wd, "/supporting_data/adj_factors.Rds"))
 
 ss <- dplyr::select(ss, country, region)
 colnames(ss)[2] <- "macroregion"

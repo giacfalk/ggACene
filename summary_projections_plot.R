@@ -553,12 +553,25 @@ paths$level <- as.factor(paths$level)
 
 lines_a <- ggplot(paths)+
   theme_classic()+
-  geom_col(aes(x=level, y=(value)*100, group=decile, fill=decile), size=1.5, position = "dodge", colour="black", lwd=0.01)+
+  geom_col(aes(x=level, y=(value)*100, group=decile, fill=decile), size=1.5, colour="lightgrey", lwd=0.01,width=0.8,    
+           position=position_dodge(.8))+
   facet_wrap(vars(ISO3), ncol=4)+
   scale_fill_brewer(name="Income quintile", palette="Blues")+
   xlab("Scenario")+
   ylab("AC penetration rate")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region.")
+
+
+lines_a <- ggplot(paths)+
+  theme_classic()+
+  geom_line(aes(x=decile, y=(value)*100, group=level, colour=level), size=.5)+
+  geom_point(aes(x=decile, y=(value)*100, group=level, colour=level), size=1.5)+
+  facet_wrap(vars(ISO3), ncol=4)+
+  scale_colour_manual(name="", values=c("grey", "#fcfc65", "#facf96", "#e38202", "#7d0404"))+
+  xlab("Income quintile")+
+  ylab("AC penetration rate (%)")+
+  theme(legend.position="bottom", legend.direction="horizontal")+
   labs(caption = "Income quintiles are calculated within each region.")
 
 write_rds(paths, "results/quntiles.rds")
@@ -605,12 +618,24 @@ paths$level <- as.factor(paths$level)
 
 lines_b <- ggplot(paths)+
   theme_classic()+
-  geom_col(aes(x=level, y=(value), group=decile, fill=decile), size=1.5, position = "dodge", colour="black", lwd=0.01)+
+  geom_col(aes(x=level, y=(value), group=decile, fill=decile), size=1.5, colour="lightgrey", lwd=0.01,width=0.8,    
+           position=position_dodge(.8))+
   facet_wrap(vars(ISO3), ncol=4)+
   scale_fill_brewer(name="Income quintile", palette="Blues")+
   xlab("Scenario")+
   ylab("Mean AC electricity consumption per HH")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region.")
+
+lines_b <- ggplot(paths)+
+  theme_classic()+
+  geom_line(aes(x=decile, y=(value), group=level, colour=level), size=.5)+
+  geom_point(aes(x=decile, y=(value), group=level, colour=level), size=1.5)+
+  facet_wrap(vars(ISO3), ncol=4)+
+  scale_colour_manual(name="", values=c("grey", "#fcfc65", "#facf96", "#e38202", "#7d0404"))+
+  xlab("Income quintile")+
+  ylab("Mean AC electricity consumption (kWh/hh./yr.)")+
+  theme(legend.position="bottom", legend.direction="horizontal")+
   labs(caption = "Income quintiles are calculated within each region.")
 
 write_rds(paths, "results/quntiles_ely.rds")

@@ -62,7 +62,7 @@ setwd(wd)
 
 ###
 
-load(paste0(wd, "results/xgboost_models_jan24.Rdata"))
+load(paste0(wd, "/results/xgboost_models_jan24.Rdata"))
 
 ###
 

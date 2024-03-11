@@ -56,7 +56,7 @@ library(patchwork)
 
 setwd(wd)
 
-load(paste0(wd, "rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
+load(paste0(wd, "/rscripts/global_spline/results/xgboost_models_jan24.Rdata"))
 
 ##############
 

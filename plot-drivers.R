@@ -7,7 +7,7 @@ library(gg.layers)
 
 setwd(wd)
 
-load(paste0(wd, "supporting_data/data_for_global_spline_v2.Rds"))
+load(paste0(wd, "/supporting_data/data_for_global_spline_v2.Rds"))
 
 ############
 

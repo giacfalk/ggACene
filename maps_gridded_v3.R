@@ -1,7 +1,7 @@
 
 library(rmapshaper)
 
-pop_ssps <- list.files(path=paste0(wd, "supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path=paste0(wd, "/supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
 pop_ssps_data <- stack(pop_ssps[2])[[10]]
 
 data(wrld_simpl)
@@ -11,12 +11,18 @@ wrld_simpl_sf <- filter(wrld_simpl_sf, NAME!="Antarctica")
 wrld_simpl_sf <- ms_filter_islands(wrld_simpl_sf, min_area = 12391399903)
 
 f1 = fasterize(shape_ac, pop_ssps_data, "SSP2.2020")*100
-f1[pop_ssps_data==0] <- NA
 
 f1_c <- projectRaster(f1, crs=newproj)
   
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X354.001344086022<1000] <- NA
 
 a <- ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -59,13 +65,19 @@ f1 = fasterize(shape_ac, pop_ssps_data, "SSP2.2050")*100
 f1_bk = fasterize(shape_ac, pop_ssps_data, "SSP2.2020")*100
 # values(f1) <- ifelse(values(f1)<values(f1_bk) , values(f1_bk) , values(f1))
 
-pop_ssps_data <- stack(pop_ssps[2])[[45]]
-f1[pop_ssps_data==0] <- NA
-
 f1_c <- projectRaster(f1, crs=newproj)
 
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[2])[[45]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
 
 c <-  ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -106,7 +118,17 @@ f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP2_2020")
 f1_c <- projectRaster(f1, crs=newproj)
 
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[2])[[10]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X354.001344086022<1000] <- NA
+
 
 e <- ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -152,7 +174,16 @@ f1_bk = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP2_2020")
 f1_c <- projectRaster(f1, crs=newproj)
 
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[2])[[45]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
 
 g <-  ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -201,7 +232,7 @@ ggsave("results/graphs_tables/maps.pdf", height = 5*1.2, width = 5*2, scale=1.35
 
 library(rmapshaper)
 
-pop_ssps <- list.files(path=paste0(wd, "supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
+pop_ssps <- list.files(path=paste0(wd, "/supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
 
 data(wrld_simpl)
 wrld_simpl_sf <- st_as_sf(wrld_simpl)
@@ -210,12 +241,20 @@ wrld_simpl_sf <- filter(wrld_simpl_sf, NAME!="Antarctica")
 wrld_simpl_sf <- ms_filter_islands(wrld_simpl_sf, min_area = 12391399903)
 
 f1 = fasterize(shape_ac, pop_ssps_data, "SSP1.2050")*100
-pop_ssps_data <- stack(pop_ssps[1])[[45]]
-f1[pop_ssps_data==0] <- NA
 f1_c <- projectRaster(f1, crs=newproj)
 
-f1_c <- as.data.frame(f1_c, xy=T)
+f1_c <- as.data.frame(f1, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[1])[[45]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
+
 
 a <- ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -256,13 +295,19 @@ b <- ggplot(aggdata) +
 f1 = fasterize(shape_ac, pop_ssps_data, "SSP3.2050")*100
 f1_bk = fasterize(shape_ac, pop_ssps_data, "SSP3.2020")*100
 # values(f1) <- ifelse(values(f1)<values(f1_bk) , values(f1_bk) , values(f1))
-
-pop_ssps_data <- stack(pop_ssps[3])[[45]]
-f1[pop_ssps_data==0] <- NA
 f1_c <- projectRaster(f1, crs=newproj)
 
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[3])[[45]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
 
 c <-  ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -302,13 +347,19 @@ d <- ggplot(aggdata) +
 f1 = fasterize(shape_ac, pop_ssps_data, "SSP5.2050")*100
 f1_bk = fasterize(shape_ac, pop_ssps_data, "SSP5.2020")*100
 # values(f1) <- ifelse(values(f1)<values(f1_bk) , values(f1_bk) , values(f1))
-
-pop_ssps_data <- stack(pop_ssps[5])[[45]]
-f1[pop_ssps_data==0] <- NA
 f1_c <- projectRaster(f1, crs=newproj)
 
+pop_ssps_data <- stack(pop_ssps[5])[[45]]
+
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
 
 e <-  ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -350,7 +401,17 @@ f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP1_2050")
 f1_c <- projectRaster(f1, crs=newproj)
 
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[1])[[45]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
+
 
 g <- ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -391,7 +452,16 @@ f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP3_2050")
 f1_c <- projectRaster(f1, crs=newproj)
 
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[3])[[45]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
 
 i <- ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
@@ -432,7 +502,16 @@ f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP5_2050")
 f1_c <- projectRaster(f1, crs=newproj)
 
 f1_c <- as.data.frame(f1_c, xy=T)
+
+pop_ssps_data <- stack(pop_ssps[5])[[45]]
+
+pop_ssps_dataa  <- as.data.frame(projectRaster(pop_ssps_data, crs=newproj), xy=T)
+
 f1_c <- na.omit(f1_c)
+
+f1_c <- merge(f1_c, pop_ssps_dataa, by=c("x", "y"))
+
+f1_c$layer[f1_c$X389.001344086022<1000] <- NA
 
 k <- ggplot()+
   geom_raster(data=f1_c, aes(x=x, y=y, fill=layer))+
