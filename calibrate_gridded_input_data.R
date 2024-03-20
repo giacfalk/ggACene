@@ -237,6 +237,15 @@ totpop_pop_ssp5_2030 <-  c$X2030[c$SCENARIO=="SSP5"] * 1e6
 totpop_pop_ssp5_2040 <-  c$X2040[c$SCENARIO=="SSP5"] * 1e6
 totpop_pop_ssp5_2050 <-  c$X2050[c$SCENARIO=="SSP5"] * 1e6
 
+totpop_pop_ssp1_2020 <-  c$X2020[c$SCENARIO=="SSP1"] * 1e6
+totpop_pop_ssp1_2030 <-  c$X2030[c$SCENARIO=="SSP1"] * 1e6
+totpop_pop_ssp1_2040 <-  c$X2040[c$SCENARIO=="SSP1"] * 1e6
+totpop_pop_ssp1_2050 <-  c$X2050[c$SCENARIO=="SSP1"] * 1e6
+totpop_pop_ssp3_2020 <-  c$X2020[c$SCENARIO=="SSP3"] * 1e6
+totpop_pop_ssp3_2030 <-  c$X2030[c$SCENARIO=="SSP3"] * 1e6
+totpop_pop_ssp3_2040 <-  c$X2040[c$SCENARIO=="SSP3"] * 1e6
+totpop_pop_ssp3_2050 <-  c$X2050[c$SCENARIO=="SSP3"] * 1e6
+
 
 #############
 #############
@@ -252,6 +261,16 @@ adjfact_pop_ssp5_2030 <-  totpop_pop_ssp5_2030 / sum(shape$pop_ssps_data_ssp5_20
 adjfact_pop_ssp5_2040 <-  totpop_pop_ssp5_2040 / sum(shape$pop_ssps_data_ssp5_2040, na.rm=T)
 adjfact_pop_ssp5_2050 <-  totpop_pop_ssp5_2050 / sum(shape$pop_ssps_data_ssp5_2050, na.rm=T)
 
+adjfact_pop_ssp1_2020 <-  totpop_pop_ssp1_2020 / sum(shape$pop_ssps_data_ssp1_2020, na.rm=T)
+adjfact_pop_ssp1_2030 <-  totpop_pop_ssp1_2030 / sum(shape$pop_ssps_data_ssp1_2030, na.rm=T)
+adjfact_pop_ssp1_2040 <-  totpop_pop_ssp1_2040 / sum(shape$pop_ssps_data_ssp1_2040, na.rm=T)
+adjfact_pop_ssp1_2050 <-  totpop_pop_ssp1_2050 / sum(shape$pop_ssps_data_ssp1_2050, na.rm=T)
+adjfact_pop_ssp3_2020 <-  totpop_pop_ssp3_2020 / sum(shape$pop_ssps_data_ssp3_2020, na.rm=T)
+adjfact_pop_ssp3_2030 <-  totpop_pop_ssp3_2030 / sum(shape$pop_ssps_data_ssp3_2030, na.rm=T)
+adjfact_pop_ssp3_2040 <-  totpop_pop_ssp3_2040 / sum(shape$pop_ssps_data_ssp3_2040, na.rm=T)
+adjfact_pop_ssp3_2050 <-  totpop_pop_ssp3_2050 / sum(shape$pop_ssps_data_ssp3_2050, na.rm=T)
+
+
 #############
 #############
 #############
@@ -265,6 +284,15 @@ shape$pop_ssps_data_ssp5_2020 <- shape$pop_ssps_data_ssp5_2020 * adjfact_pop_ssp
 shape$pop_ssps_data_ssp5_2030 <- shape$pop_ssps_data_ssp5_2030 * adjfact_pop_ssp5_2030
 shape$pop_ssps_data_ssp5_2040 <- shape$pop_ssps_data_ssp5_2040 * adjfact_pop_ssp5_2040
 shape$pop_ssps_data_ssp5_2050 <- shape$pop_ssps_data_ssp5_2050 * adjfact_pop_ssp5_2050
+
+shape$pop_ssps_data_ssp1_2020 <- shape$pop_ssps_data_ssp1_2020 * adjfact_pop_ssp1_2020
+shape$pop_ssps_data_ssp1_2030 <- shape$pop_ssps_data_ssp1_2030 * adjfact_pop_ssp1_2030
+shape$pop_ssps_data_ssp1_2040 <- shape$pop_ssps_data_ssp1_2040 * adjfact_pop_ssp1_2040
+shape$pop_ssps_data_ssp1_2050 <- shape$pop_ssps_data_ssp1_2050 * adjfact_pop_ssp1_2050
+shape$pop_ssps_data_ssp3_2020 <- shape$pop_ssps_data_ssp3_2020 * adjfact_pop_ssp3_2020
+shape$pop_ssps_data_ssp3_2030 <- shape$pop_ssps_data_ssp3_2030 * adjfact_pop_ssp3_2030
+shape$pop_ssps_data_ssp3_2040 <- shape$pop_ssps_data_ssp3_2040 * adjfact_pop_ssp3_2040
+shape$pop_ssps_data_ssp3_2050 <- shape$pop_ssps_data_ssp3_2050 * adjfact_pop_ssp3_2050
 
 ###
 
