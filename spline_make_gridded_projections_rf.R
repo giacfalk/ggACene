@@ -308,7 +308,7 @@ for (model in cmip6_models){
     
     print(year)
     
-    orig_data$phat0_obs = shape_ac[,paste0(model, ".", ssp, ".", year)] 
+    orig_data$phat0_obs = 1 
     
     orig_data$ln_total_exp_usd_2011 = (shape[,paste0("GDP_", ssp, "_", year)])
     
@@ -552,6 +552,25 @@ future_acc$id <- NULL
 
 future_ac_cons <- bind_cols(future_ac_cons, future_acc)
 
+###
+
+future_acc <- data.frame(id=1:nrow(future_no_ac_cons))
+
+for(x in c("SSP1", "SSP2", "SSP3", "SSP5")){
+  for(y in seq(2010, 2050, 10)){
+    
+    col1_columns <- grepl(y, names(future_no_ac_cons)) & grepl(x, names(future_no_ac_cons))
+    
+    varname <- paste0(x, ".", y)
+    
+    future_acc <-bind_cols(future_acc, future_no_ac_cons %>% dplyr::select(colnames(future_no_ac_cons)[col1_columns]) %>% dplyr::summarise(!!varname := rowMedians(.)))
+    
+  }}
+
+future_acc$id <- NULL
+
+future_no_ac_cons <- bind_cols(future_no_ac_cons, future_acc)
+
 ####################################
 
 # Group by ID and calculate average for col1 and col2 columns
@@ -580,13 +599,9 @@ shape_ac <- bind_cols(shape, future_ac_adoption)
 
 shape_ely_noac <- bind_cols(shape_all %>% st_set_geometry(NULL), future_no_ac_cons)
 
-shape_ely_ac <- bind_cols(shape_all %>% st_set_geometry(NULL), future_impact_ac)
-
-future_impact_ac_pctg <- future_impact_ac / as.data.frame(future_ac_cons)
+shape_ely_ac <- bind_cols(shape_all %>% st_set_geometry(NULL), future_ac_cons)
 
 shape_ely_diff <- bind_cols(shape_all %>% st_set_geometry(NULL), future_impact_ac)
-
-shape_ely_pctg <- bind_cols(shape_all %>% st_set_geometry(NULL), future_impact_ac_pctg)
 
 #######################
 
@@ -788,3 +803,5 @@ source("maps_gridded_v3.R")
 
 write_rds(shape_ac, file = "output_data/shape_ac.Rds")
 write_rds(shape_ely_diff, file = "output_data/shape_ely_diff.Rds")
+write_rds(shape_ely_ac, file = "output_data/shape_ely_ac.Rds")
+write_rds(shape_ely_noac, file = "output_data/shape_ely_noac.Rds")

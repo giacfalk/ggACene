@@ -101,6 +101,7 @@ elyglobtot
 
 median(as.numeric(elyglobtot)[3:6])
 
+summary(t(elyglobtot[1,])[3:6])
 
 #######
 

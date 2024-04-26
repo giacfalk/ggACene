@@ -95,14 +95,15 @@ shape_ac_s_cs_1 <- shape_ac_s_cs_1 %>% dplyr::group_by(region) %>% dplyr::mutate
 
 cg_a <- ggplot()+
   theme_classic()+
-  geom_vline(data=shape_ac_s_cs_1, aes(xintercept = thresh), linetype="dashed", alpha=.75, colour="violet", lwd=0.5)+
+  geom_vline(data=shape_ac_s_cs_1, aes(xintercept = thresh), linetype="dashed", alpha=.5, colour="black", lwd=0.7)+
   geom_line(data=shape_ac_s_cs_1, aes(y=hist_cg_cs, x=CDD_245_2020), colour='grey', lwd=0.5)+
   geom_line(data=shape_ac_s_cs_4, aes(y=SSP1.2050_cs, x=CDD_126_2050), colour="#fcfc65", lwd=0.5)+
     geom_line(data=shape_ac_s_cs_2, aes(y=SSP2.2050_cs, x=CDD_245_2050), colour="#facf96", lwd=0.5)+
   geom_line(data=shape_ac_s_cs_5, aes(y=SSP3.2050_cs, x=CDD_370_2050), colour="#e38202", lwd=0.5)+
   geom_line(data=shape_ac_s_cs_3, aes(y=SSP5.2050_cs, x=CDD_585_2050), colour="#b51209", lwd=0.5)+
   scale_y_continuous(labels=scales::label_percent())+
-  facet_wrap(vars(region), nrow=2)+
+  facet_wrap(vars(region), nrow=2) +
+  theme(strip.background = element_blank())+
   labs(caption = "Vertical dashed lines represent region-specific average historical CDDs/yr.")+
   xlab("CDDs / yr.")+
   ylab("Cumulative % of pop. without AC")+
@@ -136,18 +137,17 @@ cg_b<- ggplot()+
   theme_classic()+
   geom_col(data=shape_ac_s_cs, aes(y=cg/1e9, x=region, fill=scenario), colour="black", position = "dodge")+
   scale_y_continuous("Billion people without AC \nexposed to CDDs/yr.> regional avg.)")+
-  scale_x_discrete(name="", labels=c("GLOBAL", "EAP", "ECA", "LAC", "MENA", "NA", "SA", "SSA"))+
   scale_fill_manual(name='Scenario',
                      breaks=c("2020", "SSP126", "SSP245", "SSP370", "SSP585"),
                      values=c('2020'='grey', 'SSP126' = '#fcfc65', 'SSP245'='#facf96', 'SSP370' = '#e38202', 'SSP585'='#7d0404'))+
-  ylab("Macroregion")+
-  theme(legend.position = "bottom", legend.direction = "horizontal",axis.text.x = element_text(angle = 0))
+  xlab("")+
+  theme(legend.position = "bottom", legend.direction = "horizontal", axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 library(patchwork)
 
 cg_a + cg_b + plot_layout(ncol=1, heights = c(1, 1)) + plot_annotation(tag_levels = "A")
 
-ggsave("results/graphs_tables/cooling_gap.pdf", scale=1.5, height = 6, width = 4.5)
+ggsave("results/graphs_tables/cooling_gap.pdf", scale=1.5, height = 6, width = 5)
 
 #################
 
@@ -356,6 +356,10 @@ merger$`Mt CO2` <- round(merger$`Mt CO2`, 1)
 merger$`Mt CO2 (Q1)` <- round(merger$`Mt CO2 (Q1)`, 1)
 merger$`Mt CO2 (Q3)` <- round(merger$`Mt CO2 (Q3)`, 1)
 
+merger_bk <- merger
+
+###
+
 merger$`Mt CO2` <- paste0(merger$`Mt CO2`, " (", merger$`Mt CO2 (Q1)`, " - ", merger$`Mt CO2 (Q3)`, ")")
 
 merger <- dplyr::select(merger, 1,2,3)
@@ -367,6 +371,36 @@ merger <- pivot_wider(merger, names_from = Scenario, values_from = `Mt CO2`)
 sink("results/graphs_tables/emissions.tex")
 xtable(merger)
 sink()
+
+###
+
+merger_p <- merger_bk
+merger_p$year <- ifelse(merger_p$Scenario=="2020", 2020, 2050)
+merger_p$Scenario <- substr(merger_p$Scenario, 1, 6)
+merger_p <- filter(merger_p, Region!="Total")
+
+merger_p_glob <- merger_p %>% group_by(year, Scenario) %>% dplyr::summarise_if(is.numeric, sum, na.rm=T)
+
+merger_p$type ="Region"
+merger_p_glob$type ="Global"
+
+merger_p_glob$Region=" GLOBAL"
+merger_p <- bind_rows(merger_p, merger_p_glob)
+
+colnames(merger_p)[4:5] <- c("mtco2_q1", "mtco2_q3")
+
+emissions_figure <- ggplot(merger_p)+
+  theme_classic()+
+  ggtitle("Projected evolution of GHG emissions from residential AC")+
+  geom_errorbar(aes(x=as.factor(year), ymin=mtco2_q1, ymax= mtco2_q3, group=Scenario, colour=Scenario), position = "dodge", width =0.2)+
+  facet_wrap(vars(Region), scales = "free", nrow=2)+
+  xlab("Year")+
+  ylab("AC GHG emissions (Mt CO2e/yr.)")+
+  labs(caption = "Ribbon: IQR of CMIP6 GCMs") +
+  theme(strip.background = element_blank())+
+  scale_colour_manual(name="Scenario", values=c("grey", "#fcfc65", "#facf96", "#e38202", "#7d0404"))
+
+saveRDS(emissions_figure, "results/emissions_figure.rds")
 
 ################################################
 

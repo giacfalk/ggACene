@@ -50,6 +50,54 @@ shape_ely_diff$geometry <- NULL
 shape_ac[,grep("pop_", colnames(shape_ac))] <- shape_ac[,grep("pop_", colnames(shape_ac))] / shape_ac$hhsize
 
 ##
+
+# some salient results
+
+base <- (weighted.mean(shape_ely_diff$SSP2.2020, shape_ac$SSP2.2020*shape_ac$pop_ssps_data_ssp2_2020, na.rm=T)*((sum(shape_ac$pop_ssps_data_ssp2_2020*shape_ac$SSP2.2020))))/1e9
+a <- (weighted.mean(shape_ely_diff$SSP2.2050, shape_ac$SSP2.2050*shape_ac$pop_ssps_data_ssp2_2050, na.rm=T)*((sum(shape_ac$pop_ssps_data_ssp2_2050*shape_ac$SSP2.2050))))/1e9
+b <- (weighted.mean(shape_ely_diff$SSP5.2050, shape_ac$SSP5.2050*shape_ac$pop_ssps_data_ssp5_2050, na.rm=T)*((sum(shape_ac$pop_ssps_data_ssp5_2050*shape_ac$SSP5.2050))))/1e9
+c <- (weighted.mean(shape_ely_diff$SSP1.2050, shape_ac$SSP1.2050*shape_ac$pop_ssps_data_ssp1_2050, na.rm=T)*((sum(shape_ac$pop_ssps_data_ssp1_2050*shape_ac$SSP1.2050))))/1e9
+d <- (weighted.mean(shape_ely_diff$SSP3.2050, shape_ac$SSP3.2050*shape_ac$pop_ssps_data_ssp3_2050, na.rm=T)*((sum(shape_ac$pop_ssps_data_ssp3_2050*shape_ac$SSP3.2050))))/1e9
+
+base
+a
+b
+c
+d
+
+median(c(a, b, c, d))
+
+#
+
+weighted.mean(shape_ely_diff$SSP2.2020, shape_ac$SSP2.2020*shape_ac$pop_ssps_data_ssp2_2020, na.rm=T)
+weighted.mean(shape_ely_diff$SSP2.2050, shape_ac$SSP2.2050*shape_ac$pop_ssps_data_ssp2_2050, na.rm=T)
+weighted.mean(shape_ely_diff$SSP5.2050, shape_ac$SSP5.2050*shape_ac$pop_ssps_data_ssp5_2050, na.rm=T)
+weighted.mean(shape_ely_diff$SSP1.2050, shape_ac$SSP1.2050*shape_ac$pop_ssps_data_ssp1_2050, na.rm=T)
+weighted.mean(shape_ely_diff$SSP3.2050, shape_ac$SSP3.2050*shape_ac$pop_ssps_data_ssp3_2050, na.rm=T)
+
+#
+
+weighted.mean(shape_ely_diff$SSP2.2020[shape_ely_diff$region=="Sub-Saharan Africa"], shape_ac$SSP2.2020[shape_ely_diff$region=="Sub-Saharan Africa"]*shape_ac$pop_ssps_data_ssp2_2020[shape_ely_diff$region=="Sub-Saharan Africa"], na.rm=T)
+weighted.mean(shape_ely_diff$SSP2.2020[shape_ely_diff$region=="North America"], shape_ac$SSP2.2020[shape_ely_diff$region=="North America"]*shape_ac$pop_ssps_data_ssp2_2020[shape_ely_diff$region=="North America"], na.rm=T)
+
+#
+
+base <- weighted.mean(shape_ac$SSP2.2020, shape_ac$pop_ssps_data_ssp2_2020, na.rm=T)
+a <- weighted.mean(shape_ac$SSP2.2050, shape_ac$pop_ssps_data_ssp2_2050, na.rm=T)
+b <- weighted.mean(shape_ac$SSP5.2050, shape_ac$pop_ssps_data_ssp5_2050, na.rm=T)
+c <- weighted.mean(shape_ac$SSP1.2050, shape_ac$pop_ssps_data_ssp1_2050, na.rm=T)
+d <- weighted.mean(shape_ac$SSP3.2050, shape_ac$pop_ssps_data_ssp3_2050, na.rm=T)
+
+base * 100
+a * 100
+b * 100
+c * 100
+d * 100
+
+median(c(a, b, c, d))
+
+
+##
 # calculate IQR of GCMs
 
 rowwise_quantile <- function(data, probs, na.rm=T) {
@@ -394,7 +442,8 @@ lines_a <- ggplot(paths_pivot)+
   xlab("Year")+
   ylab("AC penetration rate")+
   scale_x_continuous(labels = c(2010, 2030, 2050), breaks = c(2010, 2030, 2050))+
-  labs(caption = "Ribbon: IQR of CMIP6 GCMs")
+  labs(caption = "Ribbon: IQR of CMIP6 GCMs") +
+  theme(strip.background = element_blank()) 
 
 #
 
@@ -434,20 +483,30 @@ paths_pivot <- pivot_wider(paths %>% dplyr::select(-variable), names_from = q, v
 lines_b <- ggplot(paths_pivot)+
   theme_classic()+
   ggtitle("Projected evolution of residential AC electricity consumption")+
-  geom_line(aes(x=year, y=q5/1e9, group=ssp, colour=ssp, size=as.factor(desc(type))))+
+  geom_line(aes(x=year, y=q5/1e9, group=ssp, colour=ssp, size=as.factor(desc(type))), show.legend = F)+
   geom_ribbon(aes(x=year, ymin=q1/1e9, ymax=q3/1e9, group=ssp, fill=ssp), alpha=0.1)+
   facet_wrap(vars(ISO3), scales = "free", nrow=2)+
   scale_size_manual(values = c(0.75, 1.5),guide = 'none')+
   xlab("Year")+
   ylab("AC electricity consumption (TWh/yr.)")+
   scale_x_continuous(labels = c(2010, 2030, 2050), breaks = c(2010, 2030, 2050))+
-  labs(caption = "Ribbon: IQR of CMIP6 GCMs")
+  labs(caption = "Ribbon: IQR of CMIP6 GCMs") +
+  theme(strip.background = element_blank()) 
 
 library(patchwork)
 
 (lines_a + scale_colour_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404")) + scale_fill_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))) + (lines_b + scale_colour_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404")) + scale_fill_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404"))) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
 
 ggsave("results/graphs_tables/lines_plot.pdf", scale=2, height = 5, width = 4.5)
+
+#
+
+emissions_figure <- read_rds("results/emissions_figure.rds")
+
+
+(lines_b + scale_colour_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404")) + scale_fill_manual(name="Scenario", values=c("#fcfc65", "#facf96", "#e38202", "#7d0404")) + theme(legend.position = "none")) + (emissions_figure + ggtitle("Projected evolution of GHG emissions from residential AC") + ylab("AC GHG emissions (Mt CO2e/yr.)") + theme(legend.position = "bottom", legend.direction = "horizontal") + guides(colour = guide_legend(nrow = 1))) + plot_layout(ncol=1) + plot_annotation(tag_levels = "A")
+
+ggsave("results/graphs_tables/lines_plot_new.pdf", scale=2, height = 5, width = 4.5)
 
 
 #
@@ -644,5 +703,5 @@ library(patchwork)
 
 (lines_a + lines_b) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
 
-ggsave("results/graphs_tables/quntiles_plot.pdf", scale=1.25, height = 8, width = 6)
+# ggsave("results/graphs_tables/quntiles_plot.pdf", scale=1.25, height = 8, width = 6)
 

@@ -371,7 +371,7 @@ shape_ac_socialdrivers <- bind_cols(shape, future_ac_adoption_socialdrivers)
 ##################
 ##################
 
-### 4 (social drivers only)
+### 5 (population only)
 
 output_population <- list()
 
@@ -583,7 +583,7 @@ output3 <- list()
       
       print(year)
       
-      orig_data$phat0_obs = shape_ac_baseline[,paste0(ssp, ".X", "2020")] 
+      orig_data$phat0_obs = 1
       
       orig_data$ln_total_exp_usd_2011 = (shape[,paste0("GDP_", ssp, "_", "2020")])
       
@@ -780,7 +780,7 @@ for (ssp in c("SSP1", "SSP2", "SSP3", "SSP5")){
     
     print(year)
     
-    orig_data$phat0_obs = shape_ac_cc[,paste0(ssp, ".X", "2020")] 
+    orig_data$phat0_obs = 1 
     
     orig_data$ln_total_exp_usd_2011 = (shape[,paste0("GDP_", ssp, "_", "2020")])
     
@@ -977,7 +977,7 @@ for (ssp in c("SSP1", "SSP2", "SSP3", "SSP5")){
     
     print(year)
     
-    orig_data$phat0_obs = shape_ac_econgrowth[,paste0(ssp, ".X", "2020")] 
+    orig_data$phat0_obs = 1
     
     orig_data$ln_total_exp_usd_2011 = (shape[,paste0("GDP_", ssp, "_", year)])
     
@@ -1174,7 +1174,7 @@ for (ssp in c("SSP1", "SSP2", "SSP3", "SSP5")){
     
     print(year)
     
-    orig_data$phat0_obs = shape_ac_socialdrivers[,paste0(ssp, ".X", "2020")] 
+    orig_data$phat0_obs = 1
     
     orig_data$ln_total_exp_usd_2011 = (shape[,paste0("GDP_", ssp, "_", "2020")])
     
@@ -1369,7 +1369,7 @@ for (ssp in c("SSP1", "SSP2", "SSP3", "SSP5")){
     
     print(year)
     
-    orig_data$phat0_obs = shape_ac_population[,paste0(ssp, ".X", "2020")] 
+    orig_data$phat0_obs = 1
     
     orig_data$ln_total_exp_usd_2011 = (shape[,paste0("GDP_", ssp, "_", "2020")])
     

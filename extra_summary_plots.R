@@ -209,6 +209,10 @@ sss$region <- countrycode::countrycode(sss$ISO3, 'iso3c', 'region')
 
 ###
 
+library(maptools)
+data("wrld_simpl")
+wrld_simpl <- st_as_sf(wrld_simpl)
+
 ziocountries <- tail(arrange(wrld_simpl, POP2005), 30)$ISO3
 
 library(ggrepel)
