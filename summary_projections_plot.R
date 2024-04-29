@@ -145,11 +145,11 @@ shape_ac <- bind_cols(shape_ac, future_acc_q1, future_acc_q3)
 
 ##########
 
-shape_ac_s <- dplyr::group_by(shape_ac, ISO3) %>% dplyr::summarise(SSP2.2010=weighted.mean(SSP2.2010, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050=weighted.mean(SSP2.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050=weighted.mean(SSP5.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP2.2010_q1=weighted.mean(SSP2.2010_q1, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050_q1=weighted.mean(SSP2.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050_q1=weighted.mean(SSP5.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP2.2010_q3=weighted.mean(SSP2.2010_q3, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050_q3=weighted.mean(SSP2.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050_q3=weighted.mean(SSP5.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2010=weighted.mean(SSP1.2010, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050=weighted.mean(SSP1.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050=weighted.mean(SSP3.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2010_q1=weighted.mean(SSP1.2010_q1, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050_q1=weighted.mean(SSP1.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050_q1=weighted.mean(SSP3.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2010_q3=weighted.mean(SSP1.2010_q3, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050_q3=weighted.mean(SSP1.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050_q3=weighted.mean(SSP3.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T))
+shape_ac_s <- dplyr::group_by(shape_ac, ISO3) %>% dplyr::summarise(SSP2.2020=weighted.mean(SSP2.2020, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050=weighted.mean(SSP2.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050=weighted.mean(SSP5.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP2.2020_q1=weighted.mean(SSP2.2020_q1, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050_q1=weighted.mean(SSP2.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050_q1=weighted.mean(SSP5.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP2.2020_q3=weighted.mean(SSP2.2020_q3, pop_ssps_data_ssp2_2020, na.rm=T), SSP2.2050_q3=weighted.mean(SSP2.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP5.2050_q3=weighted.mean(SSP5.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2020=weighted.mean(SSP1.2020, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050=weighted.mean(SSP1.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050=weighted.mean(SSP3.2050, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2020_q1=weighted.mean(SSP1.2020_q1, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050_q1=weighted.mean(SSP1.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050_q1=weighted.mean(SSP3.2050_q1, pop_ssps_data_ssp2_2050, na.rm=T), SSP1.2020_q3=weighted.mean(SSP1.2020_q3, pop_ssps_data_ssp2_2020, na.rm=T), SSP1.2050_q3=weighted.mean(SSP1.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T), SSP3.2050_q3=weighted.mean(SSP3.2050_q3, pop_ssps_data_ssp2_2050, na.rm=T))
 
 library(acid)
 
-shape_ac_s_gini <- dplyr::group_by(shape_ac, ISO3) %>% dplyr::reframe(SSP2.2010=weighted.gini(SSP2.2010, pop_ssps_data_ssp2_2020), SSP2.2050=weighted.gini(SSP2.2050, pop_ssps_data_ssp2_2050), SSP5.2050=weighted.gini(SSP5.2050, pop_ssps_data_ssp2_2050), SSP2.2010_q1=weighted.gini(SSP2.2010_q1, pop_ssps_data_ssp2_2020), SSP2.2050_q1=weighted.gini(SSP2.2050_q1, pop_ssps_data_ssp2_2050), SSP5.2050_q1=weighted.gini(SSP5.2050_q1, pop_ssps_data_ssp2_2050), SSP2.2010_q3=weighted.gini(SSP2.2010_q3, pop_ssps_data_ssp2_2020), SSP2.2050_q3=weighted.gini(SSP2.2050_q3, pop_ssps_data_ssp2_2050), SSP5.2050_q3=weighted.gini(SSP5.2050_q3, pop_ssps_data_ssp2_2050), SSP1.2010=weighted.gini(SSP1.2010, pop_ssps_data_ssp2_2020), SSP1.2050=weighted.gini(SSP1.2050, pop_ssps_data_ssp2_2050), SSP3.2050=weighted.gini(SSP3.2050, pop_ssps_data_ssp2_2050), SSP1.2010_q1=weighted.gini(SSP1.2010_q1, pop_ssps_data_ssp2_2020), SSP1.2050_q1=weighted.gini(SSP1.2050_q1, pop_ssps_data_ssp2_2050), SSP3.2050_q1=weighted.gini(SSP3.2050_q1, pop_ssps_data_ssp2_2050), SSP1.2010_q3=weighted.gini(SSP1.2010_q3, pop_ssps_data_ssp2_2020), SSP1.2050_q3=weighted.gini(SSP1.2050_q3, pop_ssps_data_ssp2_2050), SSP3.2050_q3=weighted.gini(SSP3.2050_q3, pop_ssps_data_ssp2_2050))
+shape_ac_s_gini <- dplyr::group_by(shape_ac, ISO3) %>% dplyr::reframe(SSP2.2020=weighted.gini(SSP2.2020, pop_ssps_data_ssp2_2020), SSP2.2050=weighted.gini(SSP2.2050, pop_ssps_data_ssp2_2050), SSP5.2050=weighted.gini(SSP5.2050, pop_ssps_data_ssp2_2050), SSP2.2020_q1=weighted.gini(SSP2.2020_q1, pop_ssps_data_ssp2_2020), SSP2.2050_q1=weighted.gini(SSP2.2050_q1, pop_ssps_data_ssp2_2050), SSP5.2050_q1=weighted.gini(SSP5.2050_q1, pop_ssps_data_ssp2_2050), SSP2.2020_q3=weighted.gini(SSP2.2020_q3, pop_ssps_data_ssp2_2020), SSP2.2050_q3=weighted.gini(SSP2.2050_q3, pop_ssps_data_ssp2_2050), SSP5.2050_q3=weighted.gini(SSP5.2050_q3, pop_ssps_data_ssp2_2050), SSP1.2020=weighted.gini(SSP1.2020, pop_ssps_data_ssp2_2020), SSP1.2050=weighted.gini(SSP1.2050, pop_ssps_data_ssp2_2050), SSP3.2050=weighted.gini(SSP3.2050, pop_ssps_data_ssp2_2050), SSP1.2020_q1=weighted.gini(SSP1.2020_q1, pop_ssps_data_ssp2_2020), SSP1.2050_q1=weighted.gini(SSP1.2050_q1, pop_ssps_data_ssp2_2050), SSP3.2050_q1=weighted.gini(SSP3.2050_q1, pop_ssps_data_ssp2_2050), SSP1.2020_q3=weighted.gini(SSP1.2020_q3, pop_ssps_data_ssp2_2020), SSP1.2050_q3=weighted.gini(SSP1.2050_q3, pop_ssps_data_ssp2_2050), SSP3.2050_q3=weighted.gini(SSP3.2050_q3, pop_ssps_data_ssp2_2050))
 
 cols.num <- colnames(shape_ac_s_gini)[2:19]
 
@@ -173,9 +173,9 @@ wrld_simpl <- st_transform(wrld_simpl, "ESRI:54009")
 
 # o2 <- ggplot()+
 #   theme_void()+
-#   geom_sf(data=shape_ac_s, aes(fill=SSP2.2010*100), colour=NA, show.legend = F)+
+#   geom_sf(data=shape_ac_s, aes(fill=SSP2.2020*100), colour=NA, show.legend = F)+
 #   geom_sf(data=wrld_simpl, colour="black", fill=NA, lwd=0.01)+
-#   ggtitle("National AC penetration rate, 2010")
+#   ggtitle("National AC penetration rate, 2020")
 # 
 # 
 # a2 <- ggplot()+
@@ -196,21 +196,21 @@ wrld_simpl <- st_transform(wrld_simpl, "ESRI:54009")
 
 library(stargazer)
 
-s_table <- shape_ac_s %>% dplyr::select(ISO3, SSP2.2010, SSP2.2050, SSP5.2050, SSP2.2010_q1, SSP2.2050_q1, SSP5.2050_q1, SSP2.2010_q3, SSP2.2050_q3, SSP5.2050_q3, SSP1.2010, SSP1.2050, SSP3.2050, SSP1.2010_q1, SSP1.2050_q1, SSP3.2050_q1, SSP1.2010_q3, SSP1.2050_q3, SSP3.2050_q3) %>% mutate(ISO3=as.character(ISO3))
+s_table <- shape_ac_s %>% dplyr::select(ISO3, SSP2.2020, SSP2.2050, SSP5.2050, SSP2.2020_q1, SSP2.2050_q1, SSP5.2050_q1, SSP2.2020_q3, SSP2.2050_q3, SSP5.2050_q3, SSP1.2020, SSP1.2050, SSP3.2050, SSP1.2020_q1, SSP1.2050_q1, SSP3.2050_q1, SSP1.2020_q3, SSP1.2050_q3, SSP3.2050_q3) %>% mutate(ISO3=as.character(ISO3))
 s_table$geometry <- NULL
 
 s_table <- bind_cols(s_table, shape_ac_s_gini %>% dplyr::select(-1))
 
-s_table$SSP2.2010 <- paste0(round(s_table$SSP2.2010, 2), " (", round(s_table$SSP2.2010_q1, 2), " - ", round(s_table$SSP2.2010_q3, 2), ")")
+s_table$SSP2.2020 <- paste0(round(s_table$SSP2.2020, 2), " (", round(s_table$SSP2.2020_q1, 2), " - ", round(s_table$SSP2.2020_q3, 2), ")")
 s_table$SSP2.2050 <- paste0(round(s_table$SSP2.2050, 2), " (", round(s_table$SSP2.2050_q1, 2), " - ", round(s_table$SSP2.2050_q3, 2), ")")
 s_table$SSP5.2050 <- paste0(round(s_table$SSP5.2050, 2), " (", round(s_table$SSP5.2050_q1, 2), " - ", round(s_table$SSP5.2050_q3, 2), ")")
 s_table$SSP1.2050 <- paste0(round(s_table$SSP1.2050, 2), " (", round(s_table$SSP1.2050_q1, 2), " - ", round(s_table$SSP1.2050_q3, 2), ")")
 s_table$SSP3.2050 <- paste0(round(s_table$SSP3.2050, 2), " (", round(s_table$SSP3.2050_q1, 2), " - ", round(s_table$SSP3.2050_q3, 2), ")")
 
-s_table <- s_table %>% dplyr::select(-SSP2.2010_q1, -SSP2.2050_q1, -SSP5.2050_q1, -SSP2.2010_q3, -SSP2.2050_q3, -SSP5.2050_q3, -SSP1.2010_q1, -SSP1.2050_q1, -SSP3.2050_q1, -SSP1.2010_q3, -SSP1.2050_q3, -SSP3.2050_q3, -SSP2.2010_q1_gini, -SSP2.2050_q1_gini, -SSP5.2050_q1_gini, -SSP2.2010_q3_gini, -SSP2.2050_q3_gini, -SSP5.2050_q3_gini, -SSP1.2010_q1_gini, -SSP1.2050_q1_gini, -SSP3.2050_q1_gini, -SSP1.2010_q3_gini, -SSP1.2050_q3_gini, -SSP3.2050_q3_gini) %>% mutate(ISO3=as.character(ISO3))
+s_table <- s_table %>% dplyr::select(-SSP2.2020_q1, -SSP2.2050_q1, -SSP5.2050_q1, -SSP2.2020_q3, -SSP2.2050_q3, -SSP5.2050_q3, -SSP1.2020_q1, -SSP1.2050_q1, -SSP3.2050_q1, -SSP1.2020_q3, -SSP1.2050_q3, -SSP3.2050_q3, -SSP2.2020_q1_gini, -SSP2.2050_q1_gini, -SSP5.2050_q1_gini, -SSP2.2020_q3_gini, -SSP2.2050_q3_gini, -SSP5.2050_q3_gini, -SSP1.2020_q1_gini, -SSP1.2050_q1_gini, -SSP3.2050_q1_gini, -SSP1.2020_q3_gini, -SSP1.2050_q3_gini, -SSP3.2050_q3_gini) %>% mutate(ISO3=as.character(ISO3))
 
-s_table$SSP1.2010 <- NULL
-s_table$SSP1.2010_gini <- NULL
+s_table$SSP1.2020 <- NULL
+s_table$SSP1.2020_gini <- NULL
 
 s_table <- s_table[,c(1, 2, 7, 3, 8, 4, 9, 5, 10, 6, 11)]
 
@@ -229,7 +229,7 @@ shape_ely_diff <- ungroup(shape_ely_diff)
 future_acc <- data.frame(id=1:nrow(shape_ely_diff))
 
 for(x in c("SSP1", "SSP2", "SSP3", "SSP5")){
-  for(y in seq(2010, 2050, 10)){
+  for(y in seq(2020, 2050, 10)){
     
     col1_columns <- grepl(y, names(shape_ely_diff)) & grepl(x, names(shape_ely_diff)) & (names(shape_ely_diff)!=paste0("cons_AC_", x, ".", y)) & (!grepl("GDP", names(shape_ely_diff)) & !grepl("URB", names(shape_ely_diff)) & !grepl("women", names(shape_ely_diff)) & !grepl("age", names(shape_ely_diff)) & !grepl("edu", names(shape_ely_diff)))
     
@@ -249,7 +249,7 @@ future_acc_q1 <- future_acc
 future_acc <- data.frame(id=1:nrow(shape_ely_diff))
 
 for(x in c("SSP1", "SSP2", "SSP3", "SSP5")){
-  for(y in seq(2010, 2050, 10)){
+  for(y in seq(2020, 2050, 10)){
     
     col1_columns <- grepl(y, names(shape_ely_diff)) & grepl(x, names(shape_ely_diff)) & (names(shape_ely_diff)!=paste0("cons_AC_", x, ".", y)) & (!grepl("GDP", names(shape_ely_diff)) & !grepl("URB", names(shape_ely_diff)) & !grepl("women", names(shape_ely_diff)) & !grepl("age", names(shape_ely_diff)) & !grepl("edu", names(shape_ely_diff)))
     
@@ -269,11 +269,11 @@ shape_ely_diff_m <- merge(shape_ac,shape_ely_diff, "id")
 
 ##########
 
-shape_ely_diff_s <- dplyr::group_by(shape_ely_diff_m, ISO3) %>% dplyr::summarise(ely_total_SSP2_2010= sum(cons_AC_SSP2.2010*(SSP2.2010*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050= sum(cons_AC_SSP2.2050*(SSP2.2050*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050= sum(cons_AC_SSP5.2050*SSP5.2050*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP2_2010_q1= sum(cons_AC_SSP2.2010_q1*(SSP2.2010_q1*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050_q1= sum(cons_AC_SSP2.2050_q1*(SSP2.2050_q1*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050_q1= sum(cons_AC_SSP5.2050_q1*SSP5.2050_q1*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP2_2010_q3= sum(cons_AC_SSP2.2010_q3*(SSP2.2010_q3*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050_q3= sum(cons_AC_SSP2.2050_q3*(SSP2.2050_q3*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050_q3= sum(cons_AC_SSP5.2050_q3*SSP5.2050_q3*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP1_2010= sum(cons_AC_SSP1.2010*(SSP1.2010*(pop_ssps_data_ssp1_2020)), na.rm = T)/1e9, ely_total_SSP1_2050= sum(cons_AC_SSP1.2050*(SSP1.2050*(pop_ssps_data_ssp1_2050)), na.rm = T)/1e9, ely_total_SSP3_2050= sum(cons_AC_SSP3.2050*SSP3.2050*(pop_ssps_data_ssp3_2050), na.rm = T)/1e9, ely_total_SSP1_2010_q1= sum(cons_AC_SSP1.2010_q1*(SSP1.2010_q1*(pop_ssps_data_ssp1_2020)), na.rm = T)/1e9, ely_total_SSP1_2050_q1= sum(cons_AC_SSP1.2050_q1*(SSP1.2050_q1*(pop_ssps_data_ssp1_2050)), na.rm = T)/1e9, ely_total_SSP3_2050_q1= sum(cons_AC_SSP3.2050_q1*SSP3.2050_q1*(pop_ssps_data_ssp3_2050), na.rm = T)/1e9, ely_total_SSP1_2010_q3= sum(cons_AC_SSP1.2010_q3*(SSP1.2010_q3*(pop_ssps_data_ssp1_2020)), na.rm = T)/1e9, ely_total_SSP1_2050_q3= sum(cons_AC_SSP1.2050_q3*(SSP1.2050_q3*(pop_ssps_data_ssp1_2050)), na.rm = T)/1e9, ely_total_SSP3_2050_q3= sum(cons_AC_SSP3.2050_q3*SSP3.2050_q3*(pop_ssps_data_ssp3_2050), na.rm = T)/1e9)
+shape_ely_diff_s <- dplyr::group_by(shape_ely_diff_m, ISO3) %>% dplyr::summarise(ely_total_SSP2_2020= sum(cons_AC_SSP2.2020*(SSP2.2020*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050= sum(cons_AC_SSP2.2050*(SSP2.2050*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050= sum(cons_AC_SSP5.2050*SSP5.2050*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP2_2020_q1= sum(cons_AC_SSP2.2020_q1*(SSP2.2020_q1*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050_q1= sum(cons_AC_SSP2.2050_q1*(SSP2.2050_q1*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050_q1= sum(cons_AC_SSP5.2050_q1*SSP5.2050_q1*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP2_2020_q3= sum(cons_AC_SSP2.2020_q3*(SSP2.2020_q3*(pop_ssps_data_ssp2_2020)), na.rm = T)/1e9, ely_total_SSP2_2050_q3= sum(cons_AC_SSP2.2050_q3*(SSP2.2050_q3*(pop_ssps_data_ssp2_2050)), na.rm = T)/1e9, ely_total_SSP5_2050_q3= sum(cons_AC_SSP5.2050_q3*SSP5.2050_q3*(pop_ssps_data_ssp5_2050), na.rm = T)/1e9, ely_total_SSP1_2020= sum(cons_AC_SSP1.2020*(SSP1.2020*(pop_ssps_data_ssp1_2020)), na.rm = T)/1e9, ely_total_SSP1_2050= sum(cons_AC_SSP1.2050*(SSP1.2050*(pop_ssps_data_ssp1_2050)), na.rm = T)/1e9, ely_total_SSP3_2050= sum(cons_AC_SSP3.2050*SSP3.2050*(pop_ssps_data_ssp3_2050), na.rm = T)/1e9, ely_total_SSP1_2020_q1= sum(cons_AC_SSP1.2020_q1*(SSP1.2020_q1*(pop_ssps_data_ssp1_2020)), na.rm = T)/1e9, ely_total_SSP1_2050_q1= sum(cons_AC_SSP1.2050_q1*(SSP1.2050_q1*(pop_ssps_data_ssp1_2050)), na.rm = T)/1e9, ely_total_SSP3_2050_q1= sum(cons_AC_SSP3.2050_q1*SSP3.2050_q1*(pop_ssps_data_ssp3_2050), na.rm = T)/1e9, ely_total_SSP1_2020_q3= sum(cons_AC_SSP1.2020_q3*(SSP1.2020_q3*(pop_ssps_data_ssp1_2020)), na.rm = T)/1e9, ely_total_SSP1_2050_q3= sum(cons_AC_SSP1.2050_q3*(SSP1.2050_q3*(pop_ssps_data_ssp1_2050)), na.rm = T)/1e9, ely_total_SSP3_2050_q3= sum(cons_AC_SSP3.2050_q3*SSP3.2050_q3*(pop_ssps_data_ssp3_2050), na.rm = T)/1e9)
 
 #
 
-shape_ely_diff_gini <- dplyr::group_by(na.omit(shape_ely_diff_m), ISO3) %>% dplyr::reframe(ely_total_SSP2_2010= weighted.gini(cons_AC_SSP2.2010, (SSP2.2010*(pop_ssps_data_ssp2_2020))), ely_total_SSP2_2050= weighted.gini(cons_AC_SSP2.2050, (SSP2.2050*(pop_ssps_data_ssp2_2050))), ely_total_SSP5_2050= weighted.gini(cons_AC_SSP5.2050, (SSP5.2050*(pop_ssps_data_ssp5_2050))), ely_total_SSP1_2050= weighted.gini(cons_AC_SSP1.2050, (SSP1.2050*(pop_ssps_data_ssp1_2050))), ely_total_SSP3_2050= weighted.gini(cons_AC_SSP3.2050, (SSP3.2050*(pop_ssps_data_ssp3_2050))))
+shape_ely_diff_gini <- dplyr::group_by(na.omit(shape_ely_diff_m), ISO3) %>% dplyr::reframe(ely_total_SSP2_2020= weighted.gini(cons_AC_SSP2.2020, (SSP2.2020*(pop_ssps_data_ssp2_2020))), ely_total_SSP2_2050= weighted.gini(cons_AC_SSP2.2050, (SSP2.2050*(pop_ssps_data_ssp2_2050))), ely_total_SSP5_2050= weighted.gini(cons_AC_SSP5.2050, (SSP5.2050*(pop_ssps_data_ssp5_2050))), ely_total_SSP1_2050= weighted.gini(cons_AC_SSP1.2050, (SSP1.2050*(pop_ssps_data_ssp1_2050))), ely_total_SSP3_2050= weighted.gini(cons_AC_SSP3.2050, (SSP3.2050*(pop_ssps_data_ssp3_2050))))
 #
 
 cols.num <- colnames(shape_ely_diff_gini)[2:6]
@@ -297,9 +297,9 @@ wrld_simpl <- st_transform(wrld_simpl, "ESRI:54009")
 # 
 # o2 <- ggplot()+
 #   theme_void()+
-#   geom_sf(data=shape_ely_diff_s, aes(fill=ely_total_SSP2_2010), colour=NA, show.legend = F)+
+#   geom_sf(data=shape_ely_diff_s, aes(fill=ely_total_SSP2_2020), colour=NA, show.legend = F)+
 #   geom_sf(data=wrld_simpl, colour="black", fill=NA, lwd=0.01)+
-#   ggtitle("AC-induced electricity consumption, 2010")
+#   ggtitle("AC-induced electricity consumption, 2020")
 # 
 # 
 # a2 <- ggplot()+
@@ -326,24 +326,24 @@ wrld_simpl <- st_transform(wrld_simpl, "ESRI:54009")
 
 library(stargazer)
 
-s_table <- shape_ely_diff_s %>% dplyr::select(ISO3, ely_total_SSP2_2010, ely_total_SSP2_2050, ely_total_SSP5_2050, ely_total_SSP2_2010_q1, ely_total_SSP2_2050_q1, ely_total_SSP5_2050_q1, ely_total_SSP2_2010_q3, ely_total_SSP2_2050_q3, ely_total_SSP5_2050_q3, ely_total_SSP1_2010, ely_total_SSP1_2050, ely_total_SSP3_2050, ely_total_SSP1_2010_q1, ely_total_SSP1_2050_q1, ely_total_SSP3_2050_q1, ely_total_SSP1_2010_q3, ely_total_SSP1_2050_q3, ely_total_SSP3_2050_q3) %>% mutate(ISO3=as.character(ISO3))
+s_table <- shape_ely_diff_s %>% dplyr::select(ISO3, ely_total_SSP2_2020, ely_total_SSP2_2050, ely_total_SSP5_2050, ely_total_SSP2_2020_q1, ely_total_SSP2_2050_q1, ely_total_SSP5_2050_q1, ely_total_SSP2_2020_q3, ely_total_SSP2_2050_q3, ely_total_SSP5_2050_q3, ely_total_SSP1_2020, ely_total_SSP1_2050, ely_total_SSP3_2050, ely_total_SSP1_2020_q1, ely_total_SSP1_2050_q1, ely_total_SSP3_2050_q1, ely_total_SSP1_2020_q3, ely_total_SSP1_2050_q3, ely_total_SSP3_2050_q3) %>% mutate(ISO3=as.character(ISO3))
 s_table$geometry <- NULL
 
-s_table$ely_total_SSP2_2010 <- paste0(round(s_table$ely_total_SSP2_2010, 2), " (", round(s_table$ely_total_SSP2_2010_q1, 2), " - ", round(s_table$ely_total_SSP2_2010_q3, 2), ")")
+s_table$ely_total_SSP2_2020 <- paste0(round(s_table$ely_total_SSP2_2020, 2), " (", round(s_table$ely_total_SSP2_2020_q1, 2), " - ", round(s_table$ely_total_SSP2_2020_q3, 2), ")")
 s_table$ely_total_SSP2_2050 <- paste0(round(s_table$ely_total_SSP2_2050, 2), " (", round(s_table$ely_total_SSP2_2050_q1, 2), " - ", round(s_table$ely_total_SSP2_2050_q3, 2), ")")
 s_table$ely_total_SSP5_2050 <- paste0(round(s_table$ely_total_SSP5_2050, 2), " (", round(s_table$ely_total_SSP5_2050_q1, 2), " - ", round(s_table$ely_total_SSP5_2050_q3, 2), ")")
-s_table$ely_total_SSP1_2010 <- paste0(round(s_table$ely_total_SSP1_2010, 2), " (", round(s_table$ely_total_SSP1_2010_q1, 2), " - ", round(s_table$ely_total_SSP1_2010_q3, 2), ")")
+s_table$ely_total_SSP1_2020 <- paste0(round(s_table$ely_total_SSP1_2020, 2), " (", round(s_table$ely_total_SSP1_2020_q1, 2), " - ", round(s_table$ely_total_SSP1_2020_q3, 2), ")")
 s_table$ely_total_SSP1_2050 <- paste0(round(s_table$ely_total_SSP1_2050, 2), " (", round(s_table$ely_total_SSP1_2050_q1, 2), " - ", round(s_table$ely_total_SSP1_2050_q3, 2), ")")
 s_table$ely_total_SSP3_2050 <- paste0(round(s_table$ely_total_SSP3_2050, 2), " (", round(s_table$ely_total_SSP3_2050_q1, 2), " - ", round(s_table$ely_total_SSP3_2050_q3, 2), ")")
 
-s_table <- s_table %>% dplyr::select(-ely_total_SSP2_2010_q1, -ely_total_SSP2_2050_q1, -ely_total_SSP5_2050_q1, -ely_total_SSP2_2010_q3, -ely_total_SSP2_2050_q3, -ely_total_SSP5_2050_q3, -ely_total_SSP1_2010_q1, -ely_total_SSP1_2050_q1, -ely_total_SSP3_2050_q1, -ely_total_SSP1_2010_q3, -ely_total_SSP1_2050_q3, -ely_total_SSP3_2050_q3) %>% mutate(ISO3=as.character(ISO3))
+s_table <- s_table %>% dplyr::select(-ely_total_SSP2_2020_q1, -ely_total_SSP2_2050_q1, -ely_total_SSP5_2050_q1, -ely_total_SSP2_2020_q3, -ely_total_SSP2_2050_q3, -ely_total_SSP5_2050_q3, -ely_total_SSP1_2020_q1, -ely_total_SSP1_2050_q1, -ely_total_SSP3_2050_q1, -ely_total_SSP1_2020_q3, -ely_total_SSP1_2050_q3, -ely_total_SSP3_2050_q3) %>% mutate(ISO3=as.character(ISO3))
 
 ###
 
 s_table <- merge(s_table, shape_ely_diff_gini, by="ISO3")
 
-s_table$ely_total_SSP1_2010 <- NULL
-s_table$ely_total_SSP1_2010_gini <- NULL
+s_table$ely_total_SSP1_2020 <- NULL
+s_table$ely_total_SSP1_2020_gini <- NULL
 
 s_table <- s_table[,c(1, 2, 7, 3, 8, 4, 9, 5, 10, 6, 11)]
 
@@ -356,7 +356,7 @@ stargazer::stargazer(s_table, summary=F, out="results/graphs_tables/ELY_AC_consu
 # shape_ac_s_top10 <- filter(shape_ac_s, shape_ac_s$POP2005 >=sort(shape_ac_s$POP2005, decreasing = T)[20])
 # 
 # shape_ac_s_top10$geometry <- NULL
-# shape_ac_s_top10 <- dplyr::select(shape_ac_s_top10, SSP2.2010, SSP2.2050, SSP5.2050, ISO3)
+# shape_ac_s_top10 <- dplyr::select(shape_ac_s_top10, SSP2.2020, SSP2.2050, SSP5.2050, ISO3)
 # shape_ac_s_top10 <- reshape2::melt(shape_ac_s_top10, 4)
 # 
 # ggplot(shape_ac_s_top10)+

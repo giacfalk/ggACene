@@ -100,7 +100,7 @@ View(paths %>% group_by(ISO3, decile, level) %>% dplyr::summarise(value=weighted
 lines_a <- ggplot(paths %>% filter(level=="2020" | level=="2050, SSP245"))+
   theme_classic()+
   geom_boxplot(aes(x=decile, y=(value)*100, weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
-  facet_wrap(vars(ISO3), ncol=4)+
+  facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
   scale_fill_manual(name="", values=c("lightblue", "navyblue"))+
   xlab("Income quintile")+
   ylab("AC penetration rate")+
@@ -175,7 +175,16 @@ paths2 <- bind_rows(paths2, globbo)
 
 #######
 
-lines_b <- ggplot(paths2 %>% filter(level=="2020" | level=="2050, SSP245"))+
+lines_b <- ggplot(paths2 %>% filter(level=="2020" | level=="2050, SSP245") %>% group_by(decile, level) %>% mutate(
+  q1 = quantile(value, 0.25, na.rm=T),
+  q3 = quantile(value, 0.75, na.rm=T),
+  iqr = q3 - q1,
+  upper_bound = q3 + 1.5 * iqr,
+  lower_bound = q1 - 1.5 * iqr
+) %>%
+  filter(value >= lower_bound & value <= upper_bound) %>%
+  # Optional: Remove the added columns (q1, q3, etc.)
+  dplyr::select(-q1, -q3, -iqr, -upper_bound, -lower_bound))+
   theme_classic()+
   geom_boxplot(aes(x=decile, y=(value), weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
   facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
@@ -192,5 +201,5 @@ library(patchwork)
 
 (lines_a + lines_b) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
 
-ggsave("results/graphs_tables/quntiles_plot.pdf", scale=1.25, height = 8, width = 6)
+ggsave("results/graphs_tables/quntiles_plot.pdf", scale=1.25, height = 8, width = 7)
 

@@ -528,6 +528,10 @@ ss$year <- substr(ss$variable, 7, 10)
 
 ss$driver <- factor(ss$driver, levels=rev(c(" historical", "cc", "econgrowth", "socialdrivers")))
 
+ss$value <- ifelse(ss$value<0, -ss$value, ss$value)
+
+ss <- ss %>% group_by(scenario) %>% mutate(value=ifelse(driver==" historical", value[driver==" historical" & year==2020], value))
+
 deco_ac <- ggplot(ss %>% dplyr::filter(year>2010))+
   geom_col(aes(x=year, y=value*100, fill=driver))+
   facet_wrap(vars(scenario))+
@@ -1589,11 +1593,56 @@ weighted_sum <- function(values, weights) {
 
 #
 
-shape_ely_baseline <- shape_ely_baseline %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, population/hhsize))
-shape_ely_cc <- shape_ely_cc%>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, population/hhsize))
-shape_ely_econgrowth <- shape_ely_econgrowth %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, population/hhsize))
-shape_ely_socialdrivers <- shape_ely_socialdrivers %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, population/hhsize))
-shape_ely_population <- shape_ely_population %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, population/hhsize))
+# merge with AC penetration
+
+load("fordriver_decompo.Rdata")
+
+# plot
+
+shape_ac_baseline <- dplyr::select(shape_ac_baseline, id, 4201:4220)
+shape_ac_cc <- dplyr::select(shape_ac_cc, id,  4201:4220)
+shape_ac_econgrowth <- dplyr::select(shape_ac_econgrowth, id,  4201:4220)
+shape_ac_socialdrivers <- dplyr::select(shape_ac_socialdrivers, id,  4201:4220)
+shape_ac_population <- dplyr::select(shape_ac_population, id,  4201:4220)
+
+pops <- dplyr::select(shape, id,  starts_with("pop_ssps_data"))  %>% dplyr::select(!contains("ssp4"))
+pops$pop_ssps_data_hist <- NULL
+pops <- melt(pops, "id")
+colnames(pops)[3] <- "population"
+
+pops$variable <- gsub("pop_ssps_data_", "", pops$variable)
+pops$variable <- gsub("_", ".X", pops$variable)
+pops$variable <- toupper(pops$variable)
+
+shape_ac_baseline <- melt(shape_ac_baseline, "id")
+shape_ac_baseline <- merge(shape_ac_baseline, pops, by=c("id", "variable"))
+
+shape_ac_cc <- melt(shape_ac_cc, "id")
+shape_ac_cc <- merge(shape_ac_cc, pops, by=c("id", "variable"))
+
+shape_ac_econgrowth <- melt(shape_ac_econgrowth, "id")
+shape_ac_econgrowth <- merge(shape_ac_econgrowth, pops, by=c("id", "variable"))
+
+shape_ac_socialdrivers <- melt(shape_ac_socialdrivers, "id")
+shape_ac_socialdrivers <- merge(shape_ac_socialdrivers, pops, by=c("id", "variable"))
+
+shape_ac_population <- melt(shape_ac_population, "id")
+shape_ac_population <- merge(shape_ac_population, pops, by=c("id", "variable"))
+
+#
+
+shape_ely_baseline <- merge(shape_ely_baseline, shape_ac_baseline %>% dplyr::select(id, variable, value) %>% dplyr::rename(ac=value),  by=c("id", "variable"))
+shape_ely_cc <- merge(shape_ely_cc, shape_ac_cc %>% dplyr::select(id, variable, value) %>% dplyr::rename(ac=value),  by=c("id", "variable"))
+shape_ely_econgrowth <- merge(shape_ely_econgrowth, shape_ac_econgrowth %>% dplyr::select(id, variable, value) %>% dplyr::rename(ac=value),  by=c("id", "variable"))
+shape_ely_socialdrivers <- merge(shape_ely_socialdrivers, shape_ac_socialdrivers %>% dplyr::select(id, variable, value) %>% dplyr::rename(ac=value),  by=c("id", "variable"))
+shape_ely_population <- merge(shape_ely_population, shape_ac_population %>% dplyr::select(id, variable, value) %>% dplyr::rename(ac=value),  by=c("id", "variable"))
+#
+
+shape_ely_baseline <- shape_ely_baseline %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, ac*(population/hhsize)))
+shape_ely_cc <- shape_ely_cc%>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, ac*(population/hhsize)))
+shape_ely_econgrowth <- shape_ely_econgrowth %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, ac*(population/hhsize)))
+shape_ely_socialdrivers <- shape_ely_socialdrivers %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, ac*(population/hhsize)))
+shape_ely_population <- shape_ely_population %>% group_by(variable) %>% dplyr::summarise(value=weighted_sum(value, ac*(population/hhsize)))
 
 shape_ely_baseline$driver <- " historical"
 shape_ely_cc$driver <- "cc"
@@ -1617,7 +1666,7 @@ ss$driver <- factor(ss$driver, levels=rev(c(" historical", "cc", "econgrowth", "
 
 ss$value <- ifelse(ss$value<0, -ss$value, ss$value)
 
-ss$value[ss$driver==" historical"] <- 0.55e+12
+ss <- ss %>% group_by(scenario) %>% mutate(value=ifelse(driver==" historical", value[driver==" historical" & year==2020], value))
 
 deco_ely <- ggplot(ss %>% dplyr::filter(year>2010))+
   geom_col(aes(x=year, y=value/1e9, fill=driver))+

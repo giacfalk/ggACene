@@ -162,7 +162,7 @@ mycols <- colorRampPalette(colors=c('blue','green','yellow','orange','red'))
 # remove ticks, box around plot
 # https://stat.ethz.ch/pipermail/r-help/2003-July/036826.html
 
-png("results/graphs_tables/pdp2.png", width = 1200, height = 1200, res = 200)
+png("results/graphs_tables/pdp_2.png", width = 1200, height = 1200, res = 200)
 trellis.par.set("axis.line",list(col=NA,lty=1,lwd=1))
 wireframe(as.formula(ln_yhat ~ ln_cdd + ln_exp + acprob),
           data = pdp2_df, drape =T,
