@@ -8,7 +8,7 @@ This repository contains computer code (in the R programming language) to replic
 
 ## Instructions
 To reproduce the model and generate the dataset from scratch, please refer to the following steps:
-- Download input data "replication_package_input_data.7z" by cloning the following Zenodo data repository [https://doi.org/10.5281/zenodo.11073674](https://doi.org/10.5281/zenodo.11073674)
+- Download input data "replication_package_input_data.7z" by cloning the following Zenodo data repository [https://doi.org/10.5281/zenodo.12541994](https://doi.org/10.5281/zenodo.12541994)
 - Decompress the folder using 7-Zip (https://www.7-zip.org/download.html)
 - Open RStudio and adjust the path folder in the sourcer.R script
 - Run the sourcer.R script to train the ML model, make projections, and represent result files
