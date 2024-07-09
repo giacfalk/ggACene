@@ -8,10 +8,13 @@ This repository contains computer code (in the R programming language) to replic
 
 ## Instructions
 To reproduce the model and generate the dataset from scratch, please refer to the following steps:
-- Download input data "replication_package_input_data.7z" by cloning the following Zenodo data repository [https://doi.org/10.5281/zenodo.12541994](https://doi.org/10.5281/zenodo.12541994)
+- Download input data "replication_package_input_data.7z" by cloning the following Zenodo data repository [https://doi.org/10.5281/zenodo.12697821](https://doi.org/10.5281/zenodo.12697821)
 - Decompress the folder using 7-Zip (https://www.7-zip.org/download.html)
 - Open RStudio and adjust the path folder in the sourcer.R script
 - Run the sourcer.R script to train the ML model, make projections, and represent result files
 
-### References
-Falchetta, G., De Cian, E., Pavanello, F., & Wing, I. S. Inequalities in global residential cooling energy use to 2050. Forthcoming at Nature Communications
+### Figures replication package
+Moreover, the source_code_data_replication_figures.zip archive (hosted on the Zenodo data repository) contains an R script and processed input data to replicate all the figures contained in the manuscript.
+
+### Reference
+Falchetta, G., De Cian, E., Pavanello, F., & Wing, I. S. Inequalities in global residential cooling energy use to 2050. Nature Communications
