@@ -1,3 +1,9 @@
+
+# shape_ac <- readRDS("output_data/shape_ac.Rds")
+# shape_ely_diff<- readRDS("output_data/shape_ely_diff.Rds")
+# shape_ely_ac<- readRDS("output_data/shape_ely_ac.Rds")
+# shape_ely_noac<- readRDS("output_data/shape_ely_noac.Rds")
+
 library(rmapshaper)
 
 pop_ssps <- list.files(path=paste0(wd, "/supporting_data/pop_downscaled_spps"), recursive = T, pattern="nc", full.names = T)
@@ -10,6 +16,8 @@ wrld_simpl_sf <- filter(wrld_simpl_sf, NAME!="Antarctica")
 wrld_simpl_sf <- ms_filter_islands(wrld_simpl_sf, min_area = 12391399903)
 
 f1 = fasterize(shape_ac, pop_ssps_data, "SSP2.2020")*100
+
+newproj <- "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs"
 
 f1_c <- projectRaster(f1, crs=newproj)
 
@@ -50,33 +58,38 @@ aggdata <- f1_c %>% group_by(y) %>% dplyr::summarise(`Without AC`=sum(X354.00134
 
 aggdata <- melt(aggdata, 1)
 
+aggdata <- filter(aggdata, y>-50 & y<90)
+
 aggdata$y <- as.factor(aggdata$y)
 
 b <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e6, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
-  ylab("Latitude")+
-  xlab("Million individuals (2020)")+
+  ylab("")+
+  xlab("")+
   scale_x_continuous(limits = c(0, 175), position = "top")+
-  guides(fill = guide_legend(nrow = 1))
+  guides(fill = guide_legend(nrow = 1))+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 aggdata2 <- f1_c %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(X354.001344086022*((100-layer)/100), na.rm=T), `With AC`=sum(X354.001344086022*(layer/100), na.rm=T))
 
 aggdata2 <- melt(aggdata2, 1)
 
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
+
 aggdata2$x<- as.factor(aggdata2$x)
 
 b2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(y=value/1e6, x=x, fill=variable), show.legend = T) +
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
   scale_x_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  xlab("Longitude")+
-  ylab("Million individuals (2020)")+
-  scale_y_continuous(limits = c(0, 100), position = "right")
-
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(limits = c(0, 75), position = "left")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio =.125)
 
 ###
 
@@ -124,31 +137,37 @@ aggdata <- f1_c %>% group_by(y) %>% dplyr::summarise(`Without AC`=sum(X389.00134
 
 aggdata <- melt(aggdata, 1)
 
+aggdata <- filter(aggdata, y>-50 & y<90)
+
 aggdata$y <- as.factor(aggdata$y)
 
 d <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e6, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
   ylab("Latitude")+
-  xlab("Million individuals (2050, SSP245)")+
-  scale_x_continuous(limits = c(0, 175), position = "top")
+  xlab("")+
+  scale_x_continuous(limits = c(0, 175), position = "top")+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 aggdata2 <- f1_c %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(X389.001344086022*((100-layer)/100), na.rm=T), `With AC`=sum(X389.001344086022*(layer/100), na.rm=T))
 
 aggdata2 <- melt(aggdata2, 1)
 
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
+
 aggdata2$x<- as.factor(aggdata2$x)
 
 d2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(y=value/1e6, x=x, fill=variable), show.legend = T) +
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
   scale_x_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  xlab("Longitude")+
-  ylab("Million individuals (2050, SSP245)")+
-  scale_y_continuous(limits = c(0, 100), position = "right")
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(limits = c(0, 75), position = "left")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio =.125)
 
 ################
 
@@ -221,20 +240,23 @@ aggdata$X354.001344086022 <- NULL
 
 aggdata <- melt(aggdata, 1)
 
-aggdata$variable <- factor(aggdata$variable, levels=c("With AC", "Without AC"))
+aggdata$variable <- factor(aggdata$variable, levels=c("Without AC", "With AC"))
+
+aggdata <- filter(aggdata, y>-50 & y<90)
 
 aggdata$y <- as.factor(aggdata$y)
 
 
 f <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Latitude")+
-  xlab("TWh/yr. (2020)")+
+  xlab("")+
   guides(fill = guide_legend(nrow = 1))+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "top")+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 
 aggdata2 <- f1_c %>% filter(X354.001344086022>1000) %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(layer2 * X354.001344086022*((100-layer3)/100), na.rm=T), `With AC`=sum(layer * X354.001344086022*(layer3/100), na.rm=T))
@@ -243,19 +265,22 @@ aggdata2$X354.001344086022 <- NULL
 
 aggdata2 <- melt(aggdata2, 1)
 
-aggdata2$variable <- factor(aggdata2$variable, levels=c("With AC", "Without AC"))
+aggdata2$variable <- factor(aggdata2$variable, levels=c("Without AC", "With AC"))
+
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
 
 aggdata2$x <- as.factor(aggdata2$x)
 
 f2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=x, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-180, 0, 180), labels=c(-180, 0, 180))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Longitude")+
-  xlab("TWh/yr. (2020)")+
+  xlab("")+
   coord_flip()+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "bottom")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio = 0.125)
 
 ###
 
@@ -324,20 +349,23 @@ aggdata$X389.001344086022 <- NULL
 
 aggdata <- melt(aggdata, 1)
 
-aggdata$variable <- factor(aggdata$variable, levels=c("With AC", "Without AC"))
+aggdata$variable <- factor(aggdata$variable, levels=c("Without AC", "With AC"))
+
+aggdata <- filter(aggdata, y>-50 & y<90)
 
 aggdata$y <- as.factor(aggdata$y)
 
 
 h <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Latitude")+
-  xlab("TWh/yr. (2050, SSP2(45))")+
+  xlab("")+
   guides(fill = guide_legend(nrow = 1))+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "top")+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 
 aggdata2 <- f1_c %>% filter(X389.001344086022>1000) %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(layer2 * X389.001344086022*((100-layer3)/100), na.rm=T), `With AC`=sum(layer * X389.001344086022*(layer3/100), na.rm=T))
@@ -346,19 +374,22 @@ aggdata2$X389.001344086022 <- NULL
 
 aggdata2 <- melt(aggdata2, 1)
 
-aggdata2$variable <- factor(aggdata2$variable, levels=c("With AC", "Without AC"))
+aggdata2$variable <- factor(aggdata2$variable, levels=c("Without AC", "With AC"))
+
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
 
 aggdata2$x <- as.factor(aggdata2$x)
 
 h2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=x, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-180, 0, 180), labels=c(-180, 0, 180))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Longitude")+
-  xlab("TWh/yr. (2050, SSP2(45))")+
+  xlab("")+
   coord_flip()+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "bottom")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio = 0.125)
 
 library(patchwork)
 
@@ -434,32 +465,38 @@ aggdata <- f1_c %>% group_by(y) %>% dplyr::summarise(`Without AC`=sum(X389.00134
 
 aggdata <- melt(aggdata, 1)
 
+aggdata <- filter(aggdata, y>-50 & y<90)
+
 aggdata$y <- as.factor(aggdata$y)
 
 b <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e6, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
-  ylab("Latitude")+
-  xlab("Million individuals (2050, SSP126)")+
+  ylab("")+
+  xlab("")+
   scale_x_continuous(limits = c(0, 175), position = "top")+
-  guides(fill = guide_legend(nrow = 1))
+  guides(fill = guide_legend(nrow = 1))+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 aggdata2 <- f1_c %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(X389.001344086022*((100-layer)/100), na.rm=T), `With AC`=sum(X389.001344086022*(layer/100), na.rm=T))
 
 aggdata2 <- melt(aggdata2, 1)
 
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
+
 aggdata2$x<- as.factor(aggdata2$x)
 
 b2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(y=value/1e6, x=x, fill=variable), show.legend = T) +
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
   scale_x_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  xlab("Longitude")+
-  ylab("Million individuals (2050, SSP126)")+
-  scale_y_continuous(limits = c(0, 100), position = "right")
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(limits = c(0, 75), position = "left")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio =.125)
 
 
 ###
@@ -508,31 +545,38 @@ aggdata <- f1_c %>% group_by(y) %>% dplyr::summarise(`Without AC`=sum(X389.00134
 
 aggdata <- melt(aggdata, 1)
 
+aggdata <- filter(aggdata, y>-50 & y<90)
+
 aggdata$y <- as.factor(aggdata$y)
 
-d <- ggplot(aggdata) + 
-  theme_classic()+
+b <- ggplot(aggdata) + 
+  theme_void()+
   geom_col(aes(x=value/1e6, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
-  ylab("Latitude")+
-  xlab("Million individuals (2050, SSP370)")+
-  scale_x_continuous(limits = c(0, 175), position = "top")
+  ylab("")+
+  xlab("")+
+  scale_x_continuous(limits = c(0, 175), position = "top")+
+  guides(fill = guide_legend(nrow = 1))+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 aggdata2 <- f1_c %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(X389.001344086022*((100-layer)/100), na.rm=T), `With AC`=sum(X389.001344086022*(layer/100), na.rm=T))
 
 aggdata2 <- melt(aggdata2, 1)
 
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
+
 aggdata2$x<- as.factor(aggdata2$x)
 
 d2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(y=value/1e6, x=x, fill=variable), show.legend = T) +
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
   scale_x_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  xlab("Longitude")+
-  ylab("Million individuals (2050, SSP370)")+
-  scale_y_continuous(limits = c(0, 100), position = "right")
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(limits = c(0, 75), position = "left")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio =.125)
 
 ###
 
@@ -580,31 +624,38 @@ aggdata <- f1_c %>% group_by(y) %>% dplyr::summarise(`Without AC`=sum(X389.00134
 
 aggdata <- melt(aggdata, 1)
 
+aggdata <- filter(aggdata, y>-50 & y<90)
+
 aggdata$y <- as.factor(aggdata$y)
 
 f <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e6, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
-  ylab("Latitude")+
-  xlab("Million individuals (2050, SSP585)")+
-  scale_x_continuous(limits = c(0, 175), position = "top")
+  ylab("")+
+  xlab("")+
+  scale_x_continuous(limits = c(0, 175), position = "top")+
+  guides(fill = guide_legend(nrow = 1))+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 aggdata2 <- f1_c %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(X389.001344086022*((100-layer)/100), na.rm=T), `With AC`=sum(X389.001344086022*(layer/100), na.rm=T))
 
 aggdata2 <- melt(aggdata2, 1)
 
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
+
 aggdata2$x<- as.factor(aggdata2$x)
 
 f2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(y=value/1e6, x=x, fill=variable), show.legend = T) +
   scale_fill_manual(name="",values=c("darkred", "forestgreen"))+
   scale_x_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  xlab("Longitude")+
-  ylab("Million individuals (2050, SSP585)")+
-  scale_y_continuous(limits = c(0, 100), position = "right")
+  xlab("")+
+  ylab("")+
+  scale_y_continuous(limits = c(0, 75), position = "left")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio =.125)
 
 ################
 
@@ -672,21 +723,22 @@ aggdata$X389.001344086022 <- NULL
 
 aggdata <- melt(aggdata, 1)
 
-aggdata$variable <- factor(aggdata$variable, levels=c("With AC", "Without AC"))
+aggdata$variable <- factor(aggdata$variable, levels=c("Without AC", "With AC"))
+
+aggdata <- filter(aggdata, y>-50 & y<90)
 
 aggdata$y <- as.factor(aggdata$y)
 
-
 h <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Latitude")+
-  xlab("TWh/yr. (2050, SSP126)")+
+  xlab("")+
   guides(fill = guide_legend(nrow = 1))+
-  scale_x_continuous(position = "top")
-
+  scale_x_continuous(position = "top")+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 aggdata2 <- f1_c %>% filter(X389.001344086022>1000) %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(layer2 * X389.001344086022*((100-layer3)/100), na.rm=T), `With AC`=sum(layer * X389.001344086022*(layer3/100), na.rm=T))
 
@@ -694,19 +746,22 @@ aggdata2$X354.001344086022 <- NULL
 
 aggdata2 <- melt(aggdata2, 1)
 
-aggdata2$variable <- factor(aggdata2$variable, levels=c("With AC", "Without AC"))
+aggdata2$variable <- factor(aggdata2$variable, levels=c("Without AC", "With AC"))
+
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
 
 aggdata2$x <- as.factor(aggdata2$x)
 
 h2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=x, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-180, 0, 180), labels=c(-180, 0, 180))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Longitude")+
-  xlab("TWh/yr. (2050, SSP126)")+
+  xlab("")+
   coord_flip()+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "bottom")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio = 0.125)
 
 ###
 
@@ -776,20 +831,23 @@ aggdata$X389.001344086022 <- NULL
 
 aggdata <- melt(aggdata, 1)
 
-aggdata$variable <- factor(aggdata$variable, levels=c("With AC", "Without AC"))
+aggdata$variable <- factor(aggdata$variable, levels=c("Without AC", "With AC"))
+
+aggdata <- filter(aggdata, y>-50 & y<90)
 
 aggdata$y <- as.factor(aggdata$y)
 
 
 j <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Latitude")+
-  xlab("TWh/yr. (2050, SSP370)")+
+  xlab("")+
   guides(fill = guide_legend(nrow = 1))+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "top")+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 
 aggdata2 <- f1_c %>% filter(X389.001344086022>1000) %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(layer2 * X389.001344086022*((100-layer3)/100), na.rm=T), `With AC`=sum(layer * X389.001344086022*(layer3/100), na.rm=T))
@@ -798,19 +856,23 @@ aggdata2$X354.001344086022 <- NULL
 
 aggdata2 <- melt(aggdata2, 1)
 
-aggdata2$variable <- factor(aggdata2$variable, levels=c("With AC", "Without AC"))
+aggdata2$variable <- factor(aggdata2$variable, levels=c("Without AC", "With AC"))
+
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
 
 aggdata2$x <- as.factor(aggdata2$x)
 
 j2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=x, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-180, 0, 180), labels=c(-180, 0, 180))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Longitude")+
-  xlab("TWh/yr. (2050, SSP370)")+
+  xlab("")+
   coord_flip()+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "bottom")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio = 0.125)
+
 ###
 
 f1 = fasterize(shape_ely_diff, pop_ssps_data, "ely_total_SSP5_2050")
@@ -879,20 +941,23 @@ aggdata$X389.001344086022 <- NULL
 
 aggdata <- melt(aggdata, 1)
 
-aggdata$variable <- factor(aggdata$variable, levels=c("With AC", "Without AC"))
+aggdata$variable <- factor(aggdata$variable, levels=c("Without AC", "With AC"))
+
+aggdata <- filter(aggdata, y>-50 & y<90)
 
 aggdata$y <- as.factor(aggdata$y)
 
 
 l <- ggplot(aggdata) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=y, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-50, 0, 50), labels=c(-50, 0, 50))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Latitude")+
-  xlab("TWh/yr. (2050, SSP585)")+
+  xlab("")+
   guides(fill = guide_legend(nrow = 1))+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "top")+
+  theme(axis.text.x = element_text(size=8), aspect.ratio =3.5)
 
 
 aggdata2 <- f1_c %>% filter(X389.001344086022>1000) %>% group_by(x) %>% dplyr::summarise(`Without AC`=sum(layer2 * X389.001344086022*((100-layer3)/100), na.rm=T), `With AC`=sum(layer * X389.001344086022*(layer3/100), na.rm=T))
@@ -901,19 +966,22 @@ aggdata2$X354.001344086022 <- NULL
 
 aggdata2 <- melt(aggdata2, 1)
 
-aggdata2$variable <- factor(aggdata2$variable, levels=c("With AC", "Without AC"))
+aggdata2$variable <- factor(aggdata2$variable, levels=c("Without AC", "With AC"))
+
+aggdata2 <- filter(aggdata2, x>-125 & x<175)
 
 aggdata2$x <- as.factor(aggdata2$x)
 
 l2 <- ggplot(aggdata2) + 
-  theme_classic()+
+  theme_void()+
   geom_col(aes(x=value/1e9, y=x, fill=variable), show.legend = T) +
   scale_y_discrete(breaks=c(-180, 0, 180), labels=c(-180, 0, 180))+
-  scale_fill_manual(name="",values=c("navyblue", "lightblue"))+
+  scale_fill_manual(name="",values=c("lightblue", "navyblue"))+
   ylab("Longitude")+
-  xlab("TWh/yr. (2050, SSP585)")+
+  xlab("")+
   coord_flip()+
-  scale_x_continuous(position = "top")
+  scale_x_continuous(position = "bottom")+
+  theme(axis.text.y = element_text(size=11), aspect.ratio = 0.125)
 
 library(patchwork)
 

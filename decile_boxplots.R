@@ -109,6 +109,43 @@ lines_a <- ggplot(paths %>% filter(level=="2020" | level=="2050, SSP245"))+
   scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
   theme(strip.background = element_blank()) 
 
+
+lines_a_si1 <- ggplot(paths %>% filter(level=="2020" | level=="2050, SSP126"))+
+  theme_classic()+
+  geom_boxplot(aes(x=decile, y=(value)*100, weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
+  facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
+  scale_fill_manual(name="", values=c("lightblue", "navyblue"))+
+  xlab("Income quintile")+
+  ylab("AC penetration rate")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region. ")+
+  scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
+  theme(strip.background = element_blank()) 
+
+lines_a_si2 <- ggplot(paths %>% filter(level=="2020" | level=="2050, SSP370"))+
+  theme_classic()+
+  geom_boxplot(aes(x=decile, y=(value)*100, weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
+  facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
+  scale_fill_manual(name="", values=c("lightblue", "navyblue"))+
+  xlab("Income quintile")+
+  ylab("AC penetration rate")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region. ")+
+  scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
+  theme(strip.background = element_blank()) 
+
+lines_a_si3 <- ggplot(paths %>% filter(level=="2020" | level=="2050, SSP585"))+
+  theme_classic()+
+  geom_boxplot(aes(x=decile, y=(value)*100, weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
+  facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
+  scale_fill_manual(name="", values=c("lightblue", "navyblue"))+
+  xlab("Income quintile")+
+  ylab("AC penetration rate")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region. ")+
+  scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
+  theme(strip.background = element_blank()) 
+
 #####
 
 shape_ac <- readRDS("output_data/shape_ac.Rds")
@@ -195,11 +232,85 @@ lines_b <- ggplot(paths2 %>% filter(level=="2020" | level=="2050, SSP245") %>% g
   labs(caption = "Income quintiles are calculated within each region. ")+
   scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
   theme(strip.background = element_blank())
+
+lines_b_si1 <- ggplot(paths2 %>% filter(level=="2020" | level=="2050, SSP126") %>% group_by(decile, level) %>% mutate(
+  q1 = quantile(value, 0.25, na.rm=T),
+  q3 = quantile(value, 0.75, na.rm=T),
+  iqr = q3 - q1,
+  upper_bound = q3 + 1.5 * iqr,
+  lower_bound = q1 - 1.5 * iqr
+) %>%
+  filter(value >= lower_bound & value <= upper_bound) %>%
+  # Optional: Remove the added columns (q1, q3, etc.)
+  dplyr::select(-q1, -q3, -iqr, -upper_bound, -lower_bound))+
+  theme_classic()+
+  geom_boxplot(aes(x=decile, y=(value), weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
+  facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
+  scale_fill_manual(name="", values=c("lightblue", "navyblue"))+
+  xlab("Income quintile")+
+  ylab("AC electricity consumption (kWh/HH./yr.)")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region. ")+
+  scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
+  theme(strip.background = element_blank())
   
+lines_b_si2 <- ggplot(paths2 %>% filter(level=="2020" | level=="2050, SSP370") %>% group_by(decile, level) %>% mutate(
+  q1 = quantile(value, 0.25, na.rm=T),
+  q3 = quantile(value, 0.75, na.rm=T),
+  iqr = q3 - q1,
+  upper_bound = q3 + 1.5 * iqr,
+  lower_bound = q1 - 1.5 * iqr
+) %>%
+  filter(value >= lower_bound & value <= upper_bound) %>%
+  # Optional: Remove the added columns (q1, q3, etc.)
+  dplyr::select(-q1, -q3, -iqr, -upper_bound, -lower_bound))+
+  theme_classic()+
+  geom_boxplot(aes(x=decile, y=(value), weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
+  facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
+  scale_fill_manual(name="", values=c("lightblue", "navyblue"))+
+  xlab("Income quintile")+
+  ylab("AC electricity consumption (kWh/HH./yr.)")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region. ")+
+  scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
+  theme(strip.background = element_blank())
+
+lines_b_si3 <- ggplot(paths2 %>% filter(level=="2020" | level=="2050, SSP585") %>% group_by(decile, level) %>% mutate(
+  q1 = quantile(value, 0.25, na.rm=T),
+  q3 = quantile(value, 0.75, na.rm=T),
+  iqr = q3 - q1,
+  upper_bound = q3 + 1.5 * iqr,
+  lower_bound = q1 - 1.5 * iqr
+) %>%
+  filter(value >= lower_bound & value <= upper_bound) %>%
+  # Optional: Remove the added columns (q1, q3, etc.)
+  dplyr::select(-q1, -q3, -iqr, -upper_bound, -lower_bound))+
+  theme_classic()+
+  geom_boxplot(aes(x=decile, y=(value), weight=pop, group=interaction(decile, level), fill=level), colour="lightgrey", lwd=0.01, outlier.colour = "transparent")+
+  facet_wrap(vars(ISO3), ncol=4, scales="free_y")+
+  scale_fill_manual(name="", values=c("lightblue", "navyblue"))+
+  xlab("Income quintile")+
+  ylab("AC electricity consumption (kWh/HH./yr.)")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position="bottom", legend.direction="horizontal")+
+  labs(caption = "Income quintiles are calculated within each region. ")+
+  scale_alpha_discrete(range=c(0.1, 1), guide = 'none') +
+  theme(strip.background = element_blank())
 
 library(patchwork)
 
 (lines_a + lines_b) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
 
 ggsave("results/graphs_tables/quntiles_plot.pdf", scale=1.25, height = 8, width = 7)
+
+(lines_a_si1 + lines_b_si1) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
+
+ggsave("results/graphs_tables/quntiles_plot_si1.pdf", scale=1.25, height = 8, width = 7)
+
+(lines_a_si2 + lines_b_si2) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
+
+ggsave("results/graphs_tables/quntiles_plot_si2.pdf", scale=1.25, height = 8, width = 7)
+
+(lines_a_si3 + lines_b_si3) + plot_layout(guides = "collect", ncol = 1) + plot_annotation(tag_levels = "A") & theme(legend.position = "bottom", legend.direction = "horizontal")  & guides(colour = guide_legend(nrow = 1))
+
+ggsave("results/graphs_tables/quntiles_plota_si3.pdf", scale=1.25, height = 8, width = 7)
 

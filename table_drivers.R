@@ -24,7 +24,6 @@ shape_gdp$ssp <- substr(shape_gdp$variable, 5, 8)
 shape_gdp$year <- substr(shape_gdp$variable, 10, 13)
 
 shape_gdp <- filter(shape_gdp, year=="2020" | year=="2050")
-shape_gdp <- filter(shape_gdp, exp(value)<100000)
 
 ###############
 
@@ -157,7 +156,7 @@ shape_cdd = shape_cdd %>% group_by(region, ssp, year) %>% dplyr::summarise(value
 
 shape_hdd = shape_hdd %>% group_by(region, ssp, year) %>% dplyr::summarise(value=mean(value, na.rm=T), variable= "HDDs")
 
-shape_gdp = shape_gdp %>% group_by(region, ssp, year) %>% dplyr::summarise(value=mean(value, na.rm=T), variable= "Per-capita GDP")
+shape_gdp = shape_gdp %>% group_by(region, ssp, year) %>% dplyr::summarise(value=median(value, na.rm=T), variable= "Per-capita GDP")
 
 shape_pop = shape_pop %>% group_by(region, ssp, year) %>% dplyr::summarise(value=sum(value, na.rm=T), variable= "Population")
 
