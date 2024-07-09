@@ -122,16 +122,22 @@ p_first_stage <- ggplot()+
   geom_tile(data=pdp1_df,
             aes(x=log(mean_CDD18_db),
                 y=log(ln_total_exp_usd_2011),
-                fill=0.01*yhat))+
+                fill=yhat))+
   theme_classic()+
-  scale_fill_gradientn(colors=c('blue','green','yellow','orange','red'))+
+  scale_fill_gradientn(colors=c('blue','green','yellow','orange','red'), name="%")+
   theme(legend.position='bottom',legend.direction='horizontal',legend.title=element_blank())+
-  xlab("Log CDDs")+
-  ylab("Log total expenditure")
+  xlab("Log Cooling Degree Days")+
+  ylab("Log total expenditure")+
+  theme(text=element_text(size=15), #change font size of all text
+          axis.text=element_text(size=15), #change font size of axis text
+          axis.title=element_text(size=15), #change font size of axis titles
+          plot.title=element_text(size=15), #change font size of plot title
+          legend.text=element_text(size=15), #change font size of legend text
+          legend.title=element_text(size=15)) #change font size of legend title  
 
-p_first_stage
+p_first_stage + ggtitle("d")
 
-ggsave("results/graphs_tables/pdp_1.png")
+ggsave("results/graphs_tables/pdp_1.pdf", height = 5, width = 5)
 
 ###
 
@@ -162,41 +168,153 @@ mycols <- colorRampPalette(colors=c('blue','green','yellow','orange','red'))
 # remove ticks, box around plot
 # https://stat.ethz.ch/pipermail/r-help/2003-July/036826.html
 
-png("results/graphs_tables/pdp_2.png", width = 1200, height = 1200, res = 200)
+pdp2_df$acprob_q <- cut(pdp2_df$acprob, (c(0, 0.25, 0.5, 0.75, 1)), labels=(c("0-25", "25-50", "50-75", "75-100")))
+
+pdp2_df$acprob_q <- factor(pdp2_df$acprob_q, levels = rev(c("25-50", "0-25", "75-100", "50-75")))
+
+pdf("results/graphs_tables/pdp_2.pdf", width = 8, height = 8)
 trellis.par.set("axis.line",list(col=NA,lty=1,lwd=1))
-wireframe(as.formula(ln_yhat ~ ln_cdd + ln_exp + acprob),
+wireframe(exp(ln_yhat) ~ ln_cdd * ln_exp | acprob_q,
           data = pdp2_df, drape =T,
-          xlab="log CDDs",ylab="AC Probability   ",zlab = list("log total expenditure",rot=90),
+          xlab=list("   log Cooling Degree Days", rot=30),ylab=list("log expenditure", rot=-30) ,zlab = list("log electricity",rot=90),
           scale = list(arrows = F),col.regions=mycols(nrow(pdp2_df)),colorkey=list(space='bottom'),
           col=NA)
 dev.off()
 
-#####
+###
 
-slopes_ac <- dplyr::select(pdp1, elas_cdd, elas_inc)
-slopes_ac <- reshape2::melt(slopes_ac)
+load("pdp_outputs.Rdata")
+
+
+pdp1_income <- matrix(data=pdp1$yhat, nrow=30, ncol=30)
+rownames(pdp1_income) <- unique(pdp1$mean_CDD18_db)
+colnames(pdp1_income) <- unique(pdp1$ln_total_exp_usd_2011)
+
+pdp1_income_r <- pdp1_income
+
+for (j in 1:nrow(pdp1_income_r)){
+  for (i in 2:ncol(pdp1_income_r)){
+    pdp1_income_r[j,i] <-((pdp1_income[j,i]/pdp1_income[j,(i-1)])-1) / ((as.numeric(rownames(pdp1_income))[i]/as.numeric(rownames(pdp1_income))[i-1])-1) 
+  }}
+
+pdp1_income_r <- pdp1_income_r[,-1]
+
+pdp1_income_r <- as.vector(pdp1_income_r)
+
+###
+
+pdp1_cdd <- matrix(data=pdp1$yhat, nrow=30, ncol=30)
+rownames(pdp1_cdd) <- unique(pdp1$ln_total_exp_usd_2011)
+colnames(pdp1_cdd) <- unique(pdp1$mean_CDD18_db)
+
+#######
+
+pdp1_cdd_r <- pdp1_cdd
+
+for (j in 1:nrow(pdp1_cdd_r)){
+  for (i in 2:ncol(pdp1_cdd_r)){
+    pdp1_cdd_r[j,i] <-((pdp1_cdd[j,i]/pdp1_cdd[j,(i-1)])-1) / ((as.numeric(rownames(pdp1_cdd))[i]/as.numeric(rownames(pdp1_cdd))[i-1])-1) 
+  }}
+
+pdp1_cdd_r <- pdp1_cdd_r[,-1]
+
+pdp1_cdd_r <- as.vector(pdp1_cdd_r)
+
+slopes_ac <- data.frame(term=c(rep("Expenditure", 870), rep("Cooling Degree Days", 870)), estimate=c(pdp1_income_r, pdp1_cdd_r))
 
 boxplot1 <- ggplot(slopes_ac)+
   theme_classic()+
-  geom_boxplot(aes(x=variable, y=value), fill="lightblue")+
-  ylab("Elasticity of AC ownership probability")+
+  geom_boxplot(aes(x=term, y=estimate), fill="lightblue")+
+  ylab("Elasticity of air-conditioning ownership probability")+
   xlab("Driver")+
-  ggtitle("D")+
-  ylim(c(-0.5, 0.5))
+  ggtitle("e")+
+  ylim(c(-0.5, 1.5))
 
-slopes_ely <- dplyr::select(pdp2, elas_ac, elas_cdd, elas_inc)
-slopes_ely <- reshape2::melt(slopes_ely)
+###
+
+pdp2_income_elas <- pdp2
+
+pdp2_income_elas <- arrange(pdp2_income_elas, phat0_obs, mean_CDD18_db)
+
+pdp2_income_elas$elasticity <- NA
+
+pdp2_income_elas <- split(pdp2_income_elas, paste0(pdp2_income_elas$phat0_obs, "_", pdp2_income_elas$mean_CDD18_db))
+
+
+for(layer in 1:length(pdp2_income_elas)){
+  
+  for (i in 2:25){
+    
+    pdp2_income_elas[[layer]]$elasticity[i] <- ((pdp2_income_elas[[layer]]$yhat[i]/pdp2_income_elas[[layer]]$yhat[(i-1)])-1) / ((pdp2_income_elas[[layer]]$ln_total_exp_usd_2011[i]/pdp2_income_elas[[layer]]$ln_total_exp_usd_2011[i-1])-1) 
+    
+  }}
+
+pdp2_income_elas <- bind_rows(pdp2_income_elas)
+
+###
+
+pdp2_cdd_elas <- pdp2
+
+pdp2_cdd_elas <- arrange(pdp2_cdd_elas, phat0_obs, ln_total_exp_usd_2011)
+
+pdp2_cdd_elas$elasticity <- NA
+
+pdp2_cdd_elas <- split(pdp2_cdd_elas, paste0(pdp2_cdd_elas$phat0_obs, "_", pdp2_cdd_elas$ln_total_exp_usd_2011))
+
+
+for(layer in 1:length(pdp2_cdd_elas)){
+  
+  for (i in 2:25){
+    
+    pdp2_cdd_elas[[layer]]$elasticity[i] <- ((pdp2_cdd_elas[[layer]]$yhat[i]/pdp2_cdd_elas[[layer]]$yhat[(i-1)])-1) / ((pdp2_cdd_elas[[layer]]$mean_CDD18_db[i]/pdp2_cdd_elas[[layer]]$mean_CDD18_db[i-1])-1) 
+    
+  }}
+
+pdp2_cdd_elas <- bind_rows(pdp2_cdd_elas)
+
+boxplot(pdp2_cdd_elas$elasticity)
+
+###
+
+pdp2_ac_elas <- pdp2
+
+pdp2_ac_elas <- arrange(pdp2_ac_elas, ln_total_exp_usd_2011, mean_CDD18_db)
+
+pdp2_ac_elas$elasticity <- NA
+
+pdp2_ac_elas <- split(pdp2_ac_elas, paste0(pdp2_ac_elas$ln_total_exp_usd_2011, "_", pdp2_ac_elas$mean_CDD18_db))
+
+
+for(layer in 1:length(pdp2_ac_elas)){
+  
+  for (i in 2:25){
+    
+    pdp2_ac_elas[[layer]]$elasticity[i] <- ((pdp2_ac_elas[[layer]]$yhat[i]/pdp2_ac_elas[[layer]]$yhat[(i-1)])-1) / ((pdp2_ac_elas[[layer]]$phat0_obs[i]/pdp2_ac_elas[[layer]]$phat0_obs[i-1])-1) 
+    
+  }}
+
+pdp2_ac_elas <- bind_rows(pdp2_ac_elas)
+
+############
+############
+
+slopes_ely <- data.frame(term=c(rep("Expenditure", 15625), rep("Cooling Degree Days", 15625), rep("Air-conditioning", 15625)), estimate=c(pdp2_income_elas$elasticity, pdp2_cdd_elas$elasticity, pdp2_ac_elas$elasticity))
 
 boxplot2 <- ggplot(slopes_ely)+
   theme_classic()+
-  geom_boxplot(aes(x=variable, y=value), fill="lightblue", outlier.alpha = 0)+
-  ylab("Elasticity of household electricity consumption")+
+  geom_boxplot(aes(x=term, y=estimate), fill="lightblue", outlier.alpha = 0)+
+  ylab("Elasticity of electricity consumption")+
   xlab("Driver")+
   ylim(c(-0.5, 1.5))
 
 library(patchwork)
 
-boxplot1 + boxplot2
+boxplot1 + boxplot2 & theme(text=element_text(size=12), #change font size of all text
+                              axis.text=element_text(size=12), #change font size of axis text
+                              axis.title=element_text(size=12), #change font size of axis titles
+                              plot.title=element_text(size=15), #change font size of plot title
+                              legend.text=element_text(size=12), #change font size of legend text
+                              legend.title=element_text(size=12)) #change font size of legend title  
 
-# ggsave("results/graphs_tables/boxplots_pdp.png", scale=1.4, width = 6, height = 3)
+ggsave("results/graphs_tables/boxplots_pdp.pdf", scale=1.6, width = 7, height = 3)
 

@@ -229,7 +229,7 @@ shape_ely_diff <- ungroup(shape_ely_diff)
 future_acc <- data.frame(id=1:nrow(shape_ely_diff))
 
 for(x in c("SSP1", "SSP2", "SSP3", "SSP5")){
-  for(y in seq(2020, 2050, 10)){
+  for(y in seq(2010, 2050, 10)){
     
     col1_columns <- grepl(y, names(shape_ely_diff)) & grepl(x, names(shape_ely_diff)) & (names(shape_ely_diff)!=paste0("cons_AC_", x, ".", y)) & (!grepl("GDP", names(shape_ely_diff)) & !grepl("URB", names(shape_ely_diff)) & !grepl("women", names(shape_ely_diff)) & !grepl("age", names(shape_ely_diff)) & !grepl("edu", names(shape_ely_diff)))
     
@@ -249,7 +249,7 @@ future_acc_q1 <- future_acc
 future_acc <- data.frame(id=1:nrow(shape_ely_diff))
 
 for(x in c("SSP1", "SSP2", "SSP3", "SSP5")){
-  for(y in seq(2020, 2050, 10)){
+  for(y in seq(2010, 2050, 10)){
     
     col1_columns <- grepl(y, names(shape_ely_diff)) & grepl(x, names(shape_ely_diff)) & (names(shape_ely_diff)!=paste0("cons_AC_", x, ".", y)) & (!grepl("GDP", names(shape_ely_diff)) & !grepl("URB", names(shape_ely_diff)) & !grepl("women", names(shape_ely_diff)) & !grepl("age", names(shape_ely_diff)) & !grepl("edu", names(shape_ely_diff)))
     
@@ -479,6 +479,8 @@ paths$ISO3 <- as.character(paths$region)
 paths$ISO3 <- ifelse(is.na(paths$ISO3), " GLOBAL", paths$ISO3)
 
 paths_pivot <- pivot_wider(paths %>% dplyr::select(-variable), names_from = q, values_from = value)
+
+writexl::write_xlsx(paths_pivot, "paths_pivot.xlsx")
 
 lines_b <- ggplot(paths_pivot)+
   theme_classic()+
